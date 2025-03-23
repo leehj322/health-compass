@@ -73,6 +73,8 @@ export default function MainPage() {
           selectedMarker: activeTab,
           onChange: (value) => setActiveTab(value),
         }}
+        hospitals={hospitals}
+        pharmacies={pharmacies}
         ref={topButtonTriggerRef}
       />
 

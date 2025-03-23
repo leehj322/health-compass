@@ -1,8 +1,15 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { DEFAULT_GEOLOCATION } from "@/constants/defaultGeolocation";
+import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
+import {
+  PlacesByLocationResponse,
+  PlaceWithDetails,
+} from "@/lib/api/getPlacesByLocation";
 
 const MARKER_OPTIONS = [
   { id: "hospital", label: "병원" },
@@ -16,28 +23,65 @@ interface MarkerFilter {
 
 interface KakaoMapProps extends React.ComponentProps<"div"> {
   markerFilter?: MarkerFilter;
+  hospitals?: PlacesByLocationResponse;
+  pharmacies?: PlacesByLocationResponse;
 }
 
 export default function KakaoMap({
   markerFilter,
+  hospitals,
+  pharmacies,
   ref,
   ...props
 }: KakaoMapProps) {
+  const [isLoading, isError] = useKakaoLoader({
+    appkey: process.env.NEXT_PUBLIC_KAKAO_JS_API_KEY!,
+  });
+  const router = useRouter();
+
   return (
     <div
       className="relative h-[50vh] w-full md:h-full md:w-2/3"
       ref={ref}
       {...props}
     >
-      {/* KakaoMap 컴포넌트로 대체 */}
-      <div className="flex h-full w-full items-center justify-center bg-gray-200">
-        <span className="text-gray-500">Kakao Map Placeholder</span>
-      </div>
+      {/* 카카오 지도 */}
+      <Map
+        center={{
+          lat: DEFAULT_GEOLOCATION.latitude,
+          lng: DEFAULT_GEOLOCATION.longitude,
+        }}
+        className="h-full w-full"
+      >
+        {markerFilter?.selectedMarker === "hospital" && hospitals && (
+          <MapMarkers places={hospitals.places} />
+        )}
+        {markerFilter?.selectedMarker === "pharmacy" && pharmacies && (
+          <MapMarkers places={pharmacies.places} />
+        )}
+      </Map>
 
       {/* 지도 위 마커 타입 필터 */}
       {markerFilter && <MarkerFilter markerFilter={markerFilter} />}
     </div>
   );
+}
+
+interface MapMarkersProps {
+  places: PlaceWithDetails[];
+}
+
+function MapMarkers({ places }: MapMarkersProps) {
+  const router = useRouter();
+
+  return places.map((place) => (
+    <MapMarker
+      key={place.id}
+      position={{ lat: Number(place.y), lng: Number(place.x) }}
+      title={place.place_name}
+      onClick={() => router.push(`/clinic/${place.id}`)}
+    />
+  ));
 }
 
 interface MarkerFilterProps {
@@ -54,7 +98,6 @@ function MarkerFilter({ markerFilter }: MarkerFilterProps) {
         {MARKER_OPTIONS.map((option) => (
           <div key={option.id} className="flex items-center space-x-2">
             <RadioGroupItem
-              key={option.id}
               id={option.id}
               value={option.id}
               className="cursor-pointer"

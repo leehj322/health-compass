@@ -37,7 +37,6 @@ export default function KakaoMap({
   const [isLoading, isError] = useKakaoLoader({
     appkey: process.env.NEXT_PUBLIC_KAKAO_JS_API_KEY!,
   });
-  const router = useRouter();
 
   return (
     <div

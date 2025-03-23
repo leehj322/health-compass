@@ -5,28 +5,29 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { formatDistance } from "@/utils/formatDistance";
+import { PlaceWithDetails } from "@/lib/api/getPlacesByLocation";
 
-export default function HospitalPharmacyCard() {
+interface HospitalPharmacyCardProps {
+  place: PlaceWithDetails;
+}
+
+export default function HospitalPharmacyCard({
+  place,
+}: HospitalPharmacyCardProps) {
   return (
     <li>
-      <Link href="/clinic/1">
+      <Link href={`/clinic/${place.id}`}>
         <Card className="relative py-3">
-          {/* 거리 - 우측 상단 고정 */}
           <span className="text-muted-foreground absolute top-2 right-3 text-sm">
-            1.2km
+            {formatDistance(Number(place.distance))}
           </span>
-
           <CardContent className="px-4 py-0">
-            {/* 이름 */}
-            <CardTitle className="text-base">서울내과의원</CardTitle>
-
-            {/* 주소 */}
+            <CardTitle className="text-base">{place.place_name}</CardTitle>
             <CardDescription className="text-sm text-gray-500">
-              서울 강남구 테헤란로 123
+              {place.road_address_name}
             </CardDescription>
-
-            {/* 전화번호 */}
-            <p className="mt-2 text-sm text-gray-700">02-123-4567</p>
+            <p className="mt-2 text-sm text-gray-700">{place.phone}</p>
           </CardContent>
         </Card>
       </Link>

@@ -11,7 +11,7 @@ import { usePlacesByLocation } from "@/lib/queries/usePlaceQueries";
 import { DEFAULT_GEOLOCATION } from "@/constants/defaultGeolocation";
 
 export default function MainPage() {
-  const { filterGroups, activeTab, setActiveTab } = useMainPageStore();
+  const { filterGroups } = useMainPageStore();
   const topButtonTriggerRef = useRef<HTMLDivElement | null>(null);
 
   const [geoLocation, setGeoLocation] = useState<GeolocationCoordinates | null>(

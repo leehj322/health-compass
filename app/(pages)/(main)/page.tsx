@@ -15,11 +15,33 @@ const DEFAULT_GEOLOCATION = {
 };
 
 export default function MainPage() {
-  const { activeTab, setActiveTab } = useMainPageStore();
+  const { filterGroups, activeTab, setActiveTab } = useMainPageStore();
   const topButtonTriggerRef = useRef<HTMLDivElement | null>(null);
 
   const [geoLocation, setGeoLocation] = useState<GeolocationCoordinates | null>(
     null,
+  );
+
+  const { data: hospitals } = usePlacesByLocation(
+    geoLocation?.latitude || DEFAULT_GEOLOCATION.latitude,
+    geoLocation?.longitude || DEFAULT_GEOLOCATION.longitude,
+    filterGroups.distance * 1000,
+    1,
+    "hospital",
+    {
+      enabled: !!geoLocation,
+    },
+  );
+
+  const { data: pharmacies } = usePlacesByLocation(
+    geoLocation?.latitude || DEFAULT_GEOLOCATION.latitude,
+    geoLocation?.longitude || DEFAULT_GEOLOCATION.longitude,
+    filterGroups.distance * 1000,
+    1,
+    "pharmacy",
+    {
+      enabled: !!geoLocation,
+    },
   );
 
   useEffect(() => {
@@ -62,7 +84,7 @@ export default function MainPage() {
       <div className="flex h-1/2 w-full flex-col border-l bg-white md:h-full md:w-1/3">
         <SearchBar />
         <NearbyFilter />
-        <HospitalPharmacyTabs />
+        <HospitalPharmacyTabs hospitals={hospitals} pharmacies={pharmacies} />
       </div>
 
       <ScrollToTopButton triggerRef={topButtonTriggerRef} />

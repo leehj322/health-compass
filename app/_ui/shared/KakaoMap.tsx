@@ -52,7 +52,7 @@ function MarkerFilter({ markerFilter }: MarkerFilterProps) {
         onValueChange={markerFilter.onChange}
       >
         {MARKER_OPTIONS.map((option) => (
-          <div className="flex items-center space-x-2">
+          <div key={option.id} className="flex items-center space-x-2">
             <RadioGroupItem
               key={option.id}
               id={option.id}

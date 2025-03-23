@@ -10,34 +10,28 @@ import {
   PlacesByLocationResponse,
   PlaceWithDetails,
 } from "@/lib/api/getPlacesByLocation";
+import { useMainPageStore } from "@/stores/useMainPageStore";
 
 const MARKER_OPTIONS = [
   { id: "hospital", label: "병원" },
   { id: "pharmacy", label: "약국" },
 ];
 
-interface MarkerFilter {
-  selectedMarker: "hospital" | "pharmacy";
-  onChange: (value: "hospital" | "pharmacy") => void;
-}
-
 interface KakaoMapProps extends React.ComponentProps<"div"> {
-  markerFilter?: MarkerFilter;
   hospitals?: PlacesByLocationResponse;
   pharmacies?: PlacesByLocationResponse;
 }
 
 export default function KakaoMap({
-  markerFilter,
   hospitals,
   pharmacies,
   ref,
   ...props
 }: KakaoMapProps) {
+  const { activeTab } = useMainPageStore();
   const [isLoading, isError] = useKakaoLoader({
     appkey: process.env.NEXT_PUBLIC_KAKAO_JS_API_KEY!,
   });
-  const router = useRouter();
 
   return (
     <div
@@ -53,16 +47,16 @@ export default function KakaoMap({
         }}
         className="h-full w-full"
       >
-        {markerFilter?.selectedMarker === "hospital" && hospitals && (
+        {activeTab === "hospital" && hospitals && (
           <MapMarkers places={hospitals.places} />
         )}
-        {markerFilter?.selectedMarker === "pharmacy" && pharmacies && (
+        {activeTab === "pharmacy" && pharmacies && (
           <MapMarkers places={pharmacies.places} />
         )}
       </Map>
 
       {/* 지도 위 마커 타입 필터 */}
-      {markerFilter && <MarkerFilter markerFilter={markerFilter} />}
+      <MarkerFilter />
     </div>
   );
 }
@@ -84,16 +78,14 @@ function MapMarkers({ places }: MapMarkersProps) {
   ));
 }
 
-interface MarkerFilterProps {
-  markerFilter: MarkerFilter;
-}
+function MarkerFilter() {
+  const { activeTab, setActiveTab } = useMainPageStore();
 
-function MarkerFilter({ markerFilter }: MarkerFilterProps) {
   return (
     <div className="absolute top-4 left-4 z-10 flex space-x-2 rounded-xl bg-white p-2 shadow-md">
       <RadioGroup
-        value={markerFilter.selectedMarker}
-        onValueChange={markerFilter.onChange}
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as typeof activeTab)}
       >
         {MARKER_OPTIONS.map((option) => (
           <div key={option.id} className="flex items-center space-x-2">

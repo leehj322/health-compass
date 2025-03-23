@@ -8,11 +8,7 @@ import SearchBar from "./_ui/SearchBar";
 import NearbyFilter from "./_ui/NearbyFilter";
 import HospitalPharmacyTabs from "./_ui/HospitalPharmacyTabs";
 import { usePlacesByLocation } from "@/lib/queries/usePlaceQueries";
-
-const DEFAULT_GEOLOCATION = {
-  latitude: 37.5716486,
-  longitude: 126.97637277,
-};
+import { DEFAULT_GEOLOCATION } from "@/constants/defaultGeolocation";
 
 export default function MainPage() {
   const { filterGroups, activeTab, setActiveTab } = useMainPageStore();
@@ -77,6 +73,8 @@ export default function MainPage() {
           selectedMarker: activeTab,
           onChange: (value) => setActiveTab(value),
         }}
+        hospitals={hospitals}
+        pharmacies={pharmacies}
         ref={topButtonTriggerRef}
       />
 

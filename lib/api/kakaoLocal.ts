@@ -1,7 +1,4 @@
-const CATEGORY_CODE = {
-  hospital: "HP8",
-  pharmacy: "PM9",
-};
+import { CATEGORY_CODE } from "@/constants/categoryCode";
 
 export const getPlaceByCategory = async (
   lat: number,

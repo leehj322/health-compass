@@ -11,6 +11,7 @@ import {
   PlaceWithDetails,
 } from "@/lib/api/getPlacesByLocation";
 import { useMainPageStore } from "@/stores/useMainPageStore";
+import { useGeoLocationStore } from "@/stores/useGeoLocation";
 
 const MARKER_OPTIONS = [
   { id: "hospital", label: "병원" },
@@ -29,6 +30,7 @@ export default function KakaoMap({
   ...props
 }: KakaoMapProps) {
   const { activeTab } = useMainPageStore();
+  const { geoLocation } = useGeoLocationStore();
   const [isLoading, isError] = useKakaoLoader({
     appkey: process.env.NEXT_PUBLIC_KAKAO_JS_API_KEY!,
   });
@@ -42,8 +44,8 @@ export default function KakaoMap({
       {/* 카카오 지도 */}
       <Map
         center={{
-          lat: DEFAULT_GEOLOCATION.latitude,
-          lng: DEFAULT_GEOLOCATION.longitude,
+          lat: geoLocation?.lat || DEFAULT_GEOLOCATION.latitude,
+          lng: geoLocation?.lng || DEFAULT_GEOLOCATION.longitude,
         }}
         className="h-full w-full"
       >

@@ -14,11 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Search } from "lucide-react";
 import { useLocationByAddress } from "@/lib/queries/useLocationByAddress";
+import { useGeoLocationStore } from "@/stores/useGeoLocation";
 
 export default function AddressSearchModal({}) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [query, setQuery] = useState("");
+  const { setGeoLocation } = useGeoLocationStore();
 
   // 무한 스크롤 로직
   const lastSimilarAddressRef = useRef<HTMLButtonElement | null>(null);
@@ -58,6 +60,11 @@ export default function AddressSearchModal({}) {
     if (isKeyboardEvent && e.key !== "Enter") return;
 
     setQuery(searchValue);
+  };
+
+  const handleAddressSelected = (x: string, y: string) => {
+    setGeoLocation({ lat: Number(x), lng: Number(y) });
+    setIsOpen(false);
   };
 
   return (
@@ -122,7 +129,9 @@ export default function AddressSearchModal({}) {
                       similarAddress.y
                     }
                     ref={idx === arr.length - 1 ? lastSimilarAddressRef : null}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() =>
+                      handleAddressSelected(similarAddress.y, similarAddress.x)
+                    }
                   >
                     {similarAddress.address_name}
                   </AddressSelectButton>

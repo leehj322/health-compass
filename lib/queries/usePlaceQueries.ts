@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./queryKeys";
-import { getPlacesByLocation } from "../api/getPlacesByLocation";
-import { PlacesByLocationResponse } from "../api/getPlacesByLocation";
+import { getPlacesByLocation } from "../api/unifiedLocationApi";
+import { PlacesByLocationResponse } from "../api/unifiedLocationApi.type";
 
 export const usePlacesByLocation = (
   lat: number,

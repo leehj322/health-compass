@@ -17,6 +17,12 @@ const MARKER_OPTIONS = [
   { id: "pharmacy", label: "약국" },
 ];
 
+const MARKER_SRC = {
+  me: "/markers/home.png",
+  hospital: "/markers/hospital.png",
+  pharmacy: "/markers/pharmacy.png",
+};
+
 interface KakaoMapProps extends React.ComponentProps<"div"> {
   hospitals?: PlacesByLocationResponse;
   pharmacies?: PlacesByLocationResponse;
@@ -60,11 +66,24 @@ export default function KakaoMap({
     >
       {/* 카카오 지도 */}
       <Map center={map.center} ref={mapRef} className="h-full w-full">
+        {geoLocation && (
+          <MapMarker
+            position={{ lat: geoLocation.lat, lng: geoLocation.lng }}
+            title="내 위치"
+            image={{
+              src: MARKER_SRC["me"],
+              size: {
+                width: 40,
+                height: 40,
+              },
+            }}
+          />
+        )}
         {activeTab === "hospital" && hospitals && (
-          <MapMarkers places={hospitals.places} />
+          <MapMarkers places={hospitals.places} variant="hospital" />
         )}
         {activeTab === "pharmacy" && pharmacies && (
-          <MapMarkers places={pharmacies.places} />
+          <MapMarkers places={pharmacies.places} variant="pharmacy" />
         )}
       </Map>
 
@@ -76,9 +95,10 @@ export default function KakaoMap({
 
 interface MapMarkersProps {
   places: PlaceWithDetails[];
+  variant: "hospital" | "pharmacy" | "me";
 }
 
-function MapMarkers({ places }: MapMarkersProps) {
+function MapMarkers({ places, variant }: MapMarkersProps) {
   const router = useRouter();
 
   return places.map((place) => (
@@ -87,6 +107,13 @@ function MapMarkers({ places }: MapMarkersProps) {
       position={{ lat: Number(place.y), lng: Number(place.x) }}
       title={place.place_name}
       onClick={() => router.push(`/clinic/${place.id}`)}
+      image={{
+        src: MARKER_SRC[variant],
+        size: {
+          width: 40,
+          height: 40,
+        },
+      }}
     />
   ));
 }

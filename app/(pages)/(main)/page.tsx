@@ -10,16 +10,18 @@ import NearbyFilter from "./_ui/NearbyFilter";
 import HospitalPharmacyTabs from "./_ui/HospitalPharmacyTabs";
 import { usePlacesByLocation } from "@/lib/queries/usePlaceQueries";
 import { DEFAULT_GEOLOCATION } from "@/constants/defaultGeolocation";
+import { useGeoLocationStore } from "@/stores/useGeoLocation";
 
 export default function MainPage() {
   const { filterGroups } = useMainPageStore();
   const topButtonTriggerRef = useRef<HTMLDivElement | null>(null);
+  const { geoLocation } = useGeoLocationStore();
 
-  const [geoLocation, setGeoLocation] = useCurrentLocation();
+  useCurrentLocation();
 
   const { data: hospitals } = usePlacesByLocation(
-    geoLocation?.latitude || DEFAULT_GEOLOCATION.latitude,
-    geoLocation?.longitude || DEFAULT_GEOLOCATION.longitude,
+    geoLocation?.lat || DEFAULT_GEOLOCATION.latitude,
+    geoLocation?.lng || DEFAULT_GEOLOCATION.longitude,
     filterGroups.distance * 1000,
     1,
     "hospital",
@@ -29,8 +31,8 @@ export default function MainPage() {
   );
 
   const { data: pharmacies } = usePlacesByLocation(
-    geoLocation?.latitude || DEFAULT_GEOLOCATION.latitude,
-    geoLocation?.longitude || DEFAULT_GEOLOCATION.longitude,
+    geoLocation?.lat || DEFAULT_GEOLOCATION.latitude,
+    geoLocation?.lng || DEFAULT_GEOLOCATION.longitude,
     filterGroups.distance * 1000,
     1,
     "pharmacy",

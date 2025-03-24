@@ -1,7 +1,7 @@
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import HospitalPharmacyCard from "./HospitalPharmacyCard";
-import { PlacesByLocationResponse } from "@/lib/api/getPlacesByLocation";
+import { PlacesByLocationResponse } from "@/lib/api/unifiedLocationApi.type";
 
 interface HospitalPharmacyTabsProps {
   hospitals: PlacesByLocationResponse | undefined;

@@ -2,15 +2,27 @@ import { useMainPageStore } from "@/stores/useMainPageStore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import HospitalPharmacyCard from "./HospitalPharmacyCard";
 import { PlacesByLocationResponse } from "@/lib/api/unifiedLocationApi.type";
+import { Button } from "@/components/ui/button";
+
+interface InfiniteQueryValues {
+  isFetchingNextPage: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: () => void;
+}
 
 interface HospitalPharmacyTabsProps {
-  hospitals: PlacesByLocationResponse | undefined;
-  pharmacies: PlacesByLocationResponse | undefined;
+  hospitals?: PlacesByLocationResponse;
+  pharmacies?: PlacesByLocationResponse;
+  infiniteValues: {
+    hospital: InfiniteQueryValues;
+    pharmacy: InfiniteQueryValues;
+  };
 }
 
 export default function HospitalPharmacyTabs({
   hospitals,
   pharmacies,
+  infiniteValues,
 }: HospitalPharmacyTabsProps) {
   const { activeTab, setActiveTab } = useMainPageStore();
 
@@ -58,6 +70,20 @@ export default function HospitalPharmacyTabs({
               ))}
             </ul>
           )}
+          {infiniteValues.hospital.hasNextPage && (
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                className="h-10 w-full border-gray-300 bg-white text-gray-800 hover:cursor-pointer hover:bg-gray-100 hover:text-black disabled:cursor-auto disabled:opacity-50"
+                onClick={infiniteValues.pharmacy.fetchNextPage}
+                disabled={infiniteValues.pharmacy.isFetchingNextPage}
+              >
+                {infiniteValues.pharmacy.isFetchingNextPage
+                  ? "불러오는 중..."
+                  : "더 불러오기"}
+              </Button>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="pharmacy">
@@ -71,6 +97,20 @@ export default function HospitalPharmacyTabs({
                 <HospitalPharmacyCard key={pharmacy.id} place={pharmacy} />
               ))}
             </ul>
+          )}
+          {infiniteValues.pharmacy.hasNextPage && (
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                className="h-10 w-full border-gray-300 bg-white text-gray-800 hover:cursor-pointer hover:bg-gray-100 hover:text-black disabled:cursor-auto disabled:opacity-50"
+                onClick={infiniteValues.pharmacy.fetchNextPage}
+                disabled={infiniteValues.pharmacy.isFetchingNextPage}
+              >
+                {infiniteValues.pharmacy.isFetchingNextPage
+                  ? "불러오는 중..."
+                  : "더 불러오기"}
+              </Button>
+            </div>
           )}
         </TabsContent>
       </Tabs>

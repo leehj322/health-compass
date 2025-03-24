@@ -59,83 +59,74 @@ export default function HospitalPharmacyTabs({
         </TabsList>
 
         <TabsContent value="hospital">
-          {hospitals == null ? (
-            <NoFilter />
-          ) : hospitals.places.length === 0 ? (
-            <NoNearbyPlaces type="hospital" />
-          ) : (
-            <ul className="space-y-3">
-              {hospitals.places.map((hospital) => (
-                <HospitalPharmacyCard key={hospital.id} place={hospital} />
-              ))}
-            </ul>
-          )}
-          {infiniteValues.hospital.hasNextPage && (
-            <div className="mt-4">
-              <Button
-                variant="outline"
-                className="h-10 w-full border-gray-300 bg-white text-gray-800 hover:cursor-pointer hover:bg-gray-100 hover:text-black disabled:cursor-auto disabled:opacity-50"
-                onClick={infiniteValues.pharmacy.fetchNextPage}
-                disabled={infiniteValues.pharmacy.isFetchingNextPage}
-              >
-                {infiniteValues.pharmacy.isFetchingNextPage
-                  ? "불러오는 중..."
-                  : "더 불러오기"}
-              </Button>
-            </div>
-          )}
+          <TabContentList
+            type="hospital"
+            data={hospitals}
+            infiniteQuery={infiniteValues.hospital}
+          />
         </TabsContent>
 
         <TabsContent value="pharmacy">
-          {pharmacies == null ? (
-            <NoFilter />
-          ) : pharmacies.places.length === 0 ? (
-            <NoNearbyPlaces type="pharmacy" />
-          ) : (
-            <ul className="space-y-3">
-              {pharmacies.places.map((pharmacy) => (
-                <HospitalPharmacyCard key={pharmacy.id} place={pharmacy} />
-              ))}
-            </ul>
-          )}
-          {infiniteValues.pharmacy.hasNextPage && (
-            <div className="mt-4">
-              <Button
-                variant="outline"
-                className="h-10 w-full border-gray-300 bg-white text-gray-800 hover:cursor-pointer hover:bg-gray-100 hover:text-black disabled:cursor-auto disabled:opacity-50"
-                onClick={infiniteValues.pharmacy.fetchNextPage}
-                disabled={infiniteValues.pharmacy.isFetchingNextPage}
-              >
-                {infiniteValues.pharmacy.isFetchingNextPage
-                  ? "불러오는 중..."
-                  : "더 불러오기"}
-              </Button>
-            </div>
-          )}
+          <TabContentList
+            type="pharmacy"
+            data={pharmacies}
+            infiniteQuery={infiniteValues.pharmacy}
+          />
         </TabsContent>
       </Tabs>
     </div>
   );
 }
 
-function NoFilter() {
-  return (
-    <div className="flex h-40 items-center justify-center text-center text-gray-500">
-      병원/약국을 검색하거나
-      <br />
-      위치 정보를 입력해주세요.
-    </div>
-  );
-}
-
-interface NoNearbyPlacesProps {
+interface TabContentListProps {
   type: "hospital" | "pharmacy";
+  data?: PlacesByLocationResponse;
+  infiniteQuery: InfiniteQueryValues;
 }
 
-function NoNearbyPlaces({ type }: NoNearbyPlacesProps) {
+function TabContentList({ type, data, infiniteQuery }: TabContentListProps) {
+  // Data가 fetch 되지 않은 경우
+  if (!data)
+    return (
+      <div className="flex h-40 items-center justify-center text-center text-gray-500">
+        병원/약국을 검색하거나
+        <br />
+        위치 정보를 입력해주세요.
+      </div>
+    );
+
+  // Data가 fetch 했으나 빈 배열인 경우
+  if (data.places.length === 0) {
+    return (
+      <div className="flex h-40 items-center justify-center text-gray-500">
+        주변에 {type === "hospital" ? "병원" : "약국"}이 없습니다.
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-40 items-center justify-center text-gray-500">
-      주변에 {type === "hospital" ? "병원" : "약국"}이 없습니다.
-    </div>
+    <>
+      <ul className="space-y-3">
+        {data.places.map((place) => (
+          <HospitalPharmacyCard key={place.id} place={place} />
+        ))}
+      </ul>
+
+      {/* Data 더 불러오기 버튼 */}
+      {infiniteQuery.hasNextPage && (
+        <div className="mt-4">
+          <Button
+            variant="outline"
+            className="h-10 w-full border-gray-300 bg-white text-gray-800 hover:cursor-pointer hover:bg-gray-100 hover:text-black disabled:cursor-auto disabled:opacity-50"
+            onClick={infiniteQuery.fetchNextPage}
+            disabled={infiniteQuery.isFetchingNextPage}
+          >
+            {infiniteQuery.isFetchingNextPage
+              ? "불러오는 중..."
+              : "더 불러오기"}
+          </Button>
+        </div>
+      )}
+    </>
   );
 }

@@ -15,12 +15,13 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Search } from "lucide-react";
 import { useLocationByAddress } from "@/lib/queries/useLocationByAddress";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
+import { cn } from "@/lib/utils";
 
 export default function AddressSearchModal({}) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [query, setQuery] = useState("");
-  const { setGeoLocation } = useGeoLocationStore();
+  const { geoLocation, setGeoLocation } = useGeoLocationStore();
 
   // 무한 스크롤 로직
   const lastSimilarAddressRef = useRef<HTMLButtonElement | null>(null);
@@ -70,7 +71,13 @@ export default function AddressSearchModal({}) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" className="flex-1 hover:cursor-pointer">
+        <Button
+          variant="secondary"
+          className={cn(
+            "flex-1 hover:cursor-pointer",
+            geoLocation && "border border-emerald-600 text-emerald-600",
+          )}
+        >
           <MapPin className="mr-1" size={16} />내 주변 찾기
         </Button>
       </DialogTrigger>

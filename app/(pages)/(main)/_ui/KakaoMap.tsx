@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { DEFAULT_GEOLOCATION } from "@/constants/defaultGeolocation";
 import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
 import {
   PlacesByLocationResponse,
@@ -29,11 +28,29 @@ export default function KakaoMap({
   ref,
   ...props
 }: KakaoMapProps) {
-  const { activeTab } = useMainPageStore();
+  const mapRef = useRef<kakao.maps.Map>(null);
+  const { map, activeTab } = useMainPageStore();
   const { geoLocation } = useGeoLocationStore();
   const [isLoading, isError] = useKakaoLoader({
     appkey: process.env.NEXT_PUBLIC_KAKAO_JS_API_KEY!,
   });
+
+  // mapRef가 생성 되면 최초 한번 zustand에 등록
+  useEffect(() => {
+    if (mapRef.current) {
+      map.setRef(mapRef.current);
+    }
+  }, [mapRef.current]);
+
+  // geoLocation값이 바뀌면 지도의 중앙을 업데이트
+  useEffect(() => {
+    if (geoLocation) {
+      map.setCenter({
+        lat: geoLocation.lat,
+        lng: geoLocation.lng,
+      });
+    }
+  }, [geoLocation]);
 
   return (
     <div
@@ -42,13 +59,7 @@ export default function KakaoMap({
       {...props}
     >
       {/* 카카오 지도 */}
-      <Map
-        center={{
-          lat: geoLocation?.lat || DEFAULT_GEOLOCATION.latitude,
-          lng: geoLocation?.lng || DEFAULT_GEOLOCATION.longitude,
-        }}
-        className="h-full w-full"
-      >
+      <Map center={map.center} ref={mapRef} className="h-full w-full">
         {activeTab === "hospital" && hospitals && (
           <MapMarkers places={hospitals.places} />
         )}

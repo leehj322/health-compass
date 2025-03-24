@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { formatDistance } from "@/utils/formatDistance";
-import { PlaceWithDetails } from "@/lib/api/getPlacesByLocation";
+import { PlaceWithDetails } from "@/lib/api/unifiedLocationApi.type";
 
 interface HospitalPharmacyCardProps {
   place: PlaceWithDetails;

@@ -9,7 +9,7 @@ import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
 import {
   PlacesByLocationResponse,
   PlaceWithDetails,
-} from "@/lib/api/getPlacesByLocation";
+} from "@/lib/api/unifiedLocationApi.type";
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
 

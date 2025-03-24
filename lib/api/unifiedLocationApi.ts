@@ -3,34 +3,8 @@ import {
   getHospitalDetailsByName,
   getPharmacyDetailsByName,
 } from "./publicData";
-
-export interface PlaceDocumentSummary {
-  road_address_name: string;
-  category_name: string;
-  distance: string;
-  id: string;
-  phone: string;
-  place_name: string;
-  place_url: string;
-  x: string;
-  y: string;
-}
-
-export interface PlaceWithDetails extends PlaceDocumentSummary {
-  details: Record<string, string> | null; // 공공 데이터 response가 데이터마다 전부 달라서 Record로 처리
-}
-
-export interface Meta {
-  is_end: boolean;
-  pageable_count: number;
-  same_name: any;
-  total_count: number;
-}
-
-export interface PlacesByLocationResponse {
-  places: PlaceWithDetails[];
-  meta: Meta;
-}
+import { PlaceDocumentSummary } from "./kakaoLocal.type";
+import { PlacesByLocationResponse } from "./unifiedLocationApi.type";
 
 export const getPlacesByLocation = async (
   lat: number,

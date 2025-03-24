@@ -8,4 +8,7 @@ export const QUERY_KEYS = {
       category: string,
     ) => ["place", category, { lat, lng, radius, page }],
   },
+  location: {
+    byAddress: (address: string) => ["location", "byAddress", address],
+  },
 };

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Filter, Moon, Music, Gift, BookOpen } from "lucide-react";
+import { Filter, Moon, Music, Gift, BookOpen } from "lucide-react";
+import AddressSearchModal from "./AddressSearchModal";
 
 export default function NearbyFilter() {
   const { filterGroups, setFilterGroups } = useMainPageStore();
@@ -12,9 +13,7 @@ export default function NearbyFilter() {
     <div className="space-y-4 border-b p-4">
       {/* 내 위치 기준 버튼 + 필터 토글 버튼 */}
       <div className="flex w-full gap-2">
-        <Button variant="secondary" className="flex-1 hover:cursor-pointer">
-          <MapPin className="mr-1" size={16} />내 주변 찾기
-        </Button>
+        <AddressSearchModal />
         <Button
           variant="outline"
           size="sm"

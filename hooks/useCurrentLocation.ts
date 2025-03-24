@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useGeoLocationStore } from "@/stores/useGeoLocation";
+import { useEffect } from "react";
 
-export default function useCurrentLocation(): [
-  GeolocationCoordinates | null,
-  React.Dispatch<React.SetStateAction<GeolocationCoordinates | null>>,
-] {
-  const [geoLocation, setGeoLocation] = useState<GeolocationCoordinates | null>(
-    null,
-  );
+export default function useCurrentLocation() {
+  const { geoLocation, setGeoLocation } = useGeoLocationStore();
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -18,7 +14,8 @@ export default function useCurrentLocation(): [
       (success) => {
         console.log("사용자가 위치 정보를 허용했습니다.");
         if (success.coords.accuracy < 100) {
-          setGeoLocation(success.coords);
+          const { latitude, longitude } = success.coords;
+          setGeoLocation({ lat: latitude, lng: longitude });
         } else {
           console.log("위치 정보가 정확하지 않습니다 직접 입력 해주세요.");
         }
@@ -32,6 +29,4 @@ export default function useCurrentLocation(): [
       },
     );
   }, []);
-
-  return [geoLocation, setGeoLocation];
 }

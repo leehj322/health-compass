@@ -9,8 +9,8 @@ import SearchBar from "./_ui/SearchBar";
 import NearbyFilter from "./_ui/NearbyFilter";
 import HospitalPharmacyTabs from "./_ui/HospitalPharmacyTabs";
 import { usePlacesByLocation } from "@/lib/queries/usePlaceQueries";
-import { DEFAULT_GEOLOCATION } from "@/constants/defaultGeolocation";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
+import { Meta } from "@/lib/api/kakaoLocal.type";
 
 export default function MainPage() {
   const { filterGroups } = useMainPageStore();
@@ -19,27 +19,39 @@ export default function MainPage() {
 
   useCurrentLocation();
 
-  const { data: hospitals } = usePlacesByLocation(
-    geoLocation?.lat || DEFAULT_GEOLOCATION.latitude,
-    geoLocation?.lng || DEFAULT_GEOLOCATION.longitude,
+  const {
+    data: infiniteHospitals,
+    fetchNextPage: fetchNextHospitalsPage,
+    hasNextPage: hasNextHospitalsPage,
+    isFetchingNextPage: isFetchingNextHospitalsPage,
+  } = usePlacesByLocation(
+    geoLocation?.lat,
+    geoLocation?.lng,
     filterGroups.distance * 1000,
-    1,
     "hospital",
-    {
-      enabled: !!geoLocation,
-    },
   );
 
-  const { data: pharmacies } = usePlacesByLocation(
-    geoLocation?.lat || DEFAULT_GEOLOCATION.latitude,
-    geoLocation?.lng || DEFAULT_GEOLOCATION.longitude,
+  const hospitals = infiniteHospitals && {
+    places: infiniteHospitals.pages.flatMap((page) => page.places),
+    meta: infiniteHospitals.pages.at(-1)?.meta as Meta,
+  };
+
+  const {
+    data: infinitePharmacies,
+    fetchNextPage: fetchNextPharmaciesPage,
+    hasNextPage: hasNextPharmaciesPage,
+    isFetchingNextPage: isFetchingNextPharmaciesPage,
+  } = usePlacesByLocation(
+    geoLocation?.lat,
+    geoLocation?.lng,
     filterGroups.distance * 1000,
-    1,
     "pharmacy",
-    {
-      enabled: !!geoLocation,
-    },
   );
+
+  const pharmacies = infinitePharmacies && {
+    places: infinitePharmacies.pages.flatMap((page) => page.places),
+    meta: infinitePharmacies.pages.at(-1)?.meta as Meta,
+  };
 
   return (
     <div className="flex flex-col md:h-[calc(100vh-5rem)] md:flex-row">
@@ -54,7 +66,22 @@ export default function MainPage() {
       <div className="flex h-1/2 w-full flex-col border-l bg-white md:h-full md:w-1/3">
         <SearchBar />
         <NearbyFilter />
-        <HospitalPharmacyTabs hospitals={hospitals} pharmacies={pharmacies} />
+        <HospitalPharmacyTabs
+          hospitals={hospitals}
+          pharmacies={pharmacies}
+          infiniteValues={{
+            hospital: {
+              fetchNextPage: fetchNextHospitalsPage,
+              hasNextPage: hasNextHospitalsPage,
+              isFetchingNextPage: isFetchingNextHospitalsPage,
+            },
+            pharmacy: {
+              fetchNextPage: fetchNextPharmaciesPage,
+              hasNextPage: hasNextPharmaciesPage,
+              isFetchingNextPage: isFetchingNextPharmaciesPage,
+            },
+          }}
+        />
       </div>
 
       <ScrollToTopButton triggerRef={topButtonTriggerRef} />

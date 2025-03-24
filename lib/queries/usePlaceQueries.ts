@@ -1,22 +1,50 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import {
+  useQuery,
+  UseQueryOptions,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import { QUERY_KEYS } from "./queryKeys";
-import { getPlacesByLocation } from "../api/unifiedLocationApi";
-import { PlacesByLocationResponse } from "../api/unifiedLocationApi.type";
+import {
+  getPlacesByLocation,
+  getPlacesByKeyword,
+} from "../api/unifiedLocationApi";
+import {
+  PlacesByLocationResponse,
+  PlacesByKeywordResponse,
+} from "../api/unifiedLocationApi.type";
 
 export const usePlacesByLocation = (
+  lat: number | undefined,
+  lng: number | undefined,
+  radius: number = 1000,
+  category: "hospital" | "pharmacy" = "hospital",
+) => {
+  return useInfiniteQuery<PlacesByLocationResponse>({
+    queryKey: QUERY_KEYS.places.byLocation(lat!, lng!, radius, category),
+    queryFn: ({ pageParam }) =>
+      getPlacesByLocation(lat!, lng!, radius, pageParam as number, category),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.meta.is_end ? undefined : allPages.length + 1;
+    },
+    enabled: !!(lat && lng),
+  });
+};
+
+export const usePlacesByKeyword = (
   lat: number,
   lng: number,
   radius: number = 1000,
   page: number = 1,
-  category: "hospital" | "pharmacy" = "hospital",
+  keyword: string = "",
   options?: Omit<
-    UseQueryOptions<PlacesByLocationResponse>,
+    UseQueryOptions<PlacesByKeywordResponse>,
     "queryKey" | "queryFn"
   >,
 ) => {
-  return useQuery<PlacesByLocationResponse>({
-    queryKey: QUERY_KEYS.places.byLocation(lat, lng, radius, page, category),
-    queryFn: () => getPlacesByLocation(lat, lng, radius, page, category),
+  return useQuery<PlacesByKeywordResponse>({
+    queryKey: QUERY_KEYS.places.byKeyword(lat, lng, radius, page, keyword),
+    queryFn: () => getPlacesByKeyword(lat, lng, radius, page, keyword),
     ...options,
   });
 };

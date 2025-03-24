@@ -1,3 +1,4 @@
+import { DEFAULT_GEOLOCATION } from "@/constants/defaultGeolocation";
 import { create } from "zustand";
 
 interface FilterGroups {
@@ -7,6 +8,14 @@ interface FilterGroups {
   saturday: boolean;
   sunday: boolean;
   holiday: boolean;
+  query: string;
+}
+
+interface MapControlState {
+  ref: kakao.maps.Map | null;
+  setRef: (ref: kakao.maps.Map) => void;
+  center: { lat: number; lng: number };
+  setCenter: (mapCenter: { lat: number; lng: number }) => void;
 }
 
 interface MainPageState {
@@ -17,6 +26,7 @@ interface MainPageState {
       ? FilterGroups[K] | ((prev: FilterGroups[K]) => FilterGroups[K])
       : FilterGroups[K],
   ) => void;
+  map: MapControlState;
   activeTab: "hospital" | "pharmacy";
   setActiveTab: (tab: "hospital" | "pharmacy") => void;
 }
@@ -29,6 +39,7 @@ export const useMainPageStore = create<MainPageState>((set) => ({
     saturday: false,
     sunday: false,
     holiday: false,
+    query: "",
   },
   setFilterGroups: (key, valueOrFn) =>
     set((state) => {
@@ -47,6 +58,27 @@ export const useMainPageStore = create<MainPageState>((set) => ({
         },
       };
     }),
+  map: {
+    ref: null,
+    setRef: (ref) =>
+      set((state) => ({
+        map: {
+          ...state.map,
+          ref,
+        },
+      })),
+    center: {
+      lat: DEFAULT_GEOLOCATION.latitude,
+      lng: DEFAULT_GEOLOCATION.longitude,
+    },
+    setCenter: (center) =>
+      set((state) => ({
+        map: {
+          ...state.map,
+          center,
+        },
+      })),
+  },
   activeTab: "hospital",
   setActiveTab: (tab) => set({ activeTab: tab }),
 }));

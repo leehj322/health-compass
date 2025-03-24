@@ -34,6 +34,37 @@ export const getPlaceByCategory = async (
   }
 };
 
+export const getPlaceByKeyword = async (
+  lat: number,
+  lng: number,
+  radius: number,
+  page: number,
+  keyword: string,
+) => {
+  const query = `query=${keyword}&x=${lng}&y=${lat}&radius=${radius}&size=10&page=${page}&sort=distance`;
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_KAKAO_LOCAL_BASE_URL}/search/keyword.json?${query}`,
+      {
+        headers: {
+          Authorization: `KakaoAK ${process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY}`,
+        },
+      },
+    );
+
+    if (!res.ok) {
+      throw new Error(`Kakao API Error ${res.status}: ${res.text()}`);
+    }
+
+    const data = await res.json();
+
+    return data;
+  } catch (error) {
+    throw new Error(`키워드 검색하기 실패: ${(error as Error).message}`);
+  }
+};
+
 export const getLocationByAddress = async (search: string, page: number) => {
   const query = `query=${search}`;
   try {

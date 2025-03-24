@@ -34,6 +34,7 @@ export interface LocationSearchResultByAddress {
 export interface PlaceDocumentSummary {
   road_address_name: string;
   category_name: string;
+  category_group_code: string;
   distance: string;
   id: string;
   phone: string;

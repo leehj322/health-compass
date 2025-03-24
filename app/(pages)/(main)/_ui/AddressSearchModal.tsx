@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   Dialog,
@@ -13,12 +13,43 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Search } from "lucide-react";
+import { useLocationByAddress } from "@/lib/queries/useLocationByAddress";
 
 export default function AddressSearchModal({}) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [query, setQuery] = useState("");
-  const similarAddresses: string[] | null = [];
+
+  // 무한 스크롤 로직
+  const lastSimilarAddressRef = useRef<HTMLButtonElement | null>(null);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useLocationByAddress(query);
+  const pages = data?.pages;
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.8 },
+    );
+
+    if (lastSimilarAddressRef.current) {
+      observer.observe(lastSimilarAddressRef.current);
+    }
+
+    return () => {
+      if (lastSimilarAddressRef.current) {
+        observer.unobserve(lastSimilarAddressRef.current);
+      }
+    };
+    // 제일 첫 페이지에서는 hasNextPage가 바뀔때 observer를 등록
+    // isFetchingNextPage가 바뀔때 마다 observer를 바꿈
+  }, [hasNextPage, isFetchingNextPage]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -65,16 +96,25 @@ export default function AddressSearchModal({}) {
 
         {/* 유사한 주소 리스트 */}
         <div className="max-h-40 space-y-2 overflow-y-auto">
-          {similarAddresses == null ? (
+          {pages == null ? (
             <SearchPlaceholder />
-          ) : similarAddresses.length === 0 ? (
+          ) : pages[0].documents.length === 0 ? (
             <NoSearchResult />
           ) : (
             <ul>
-              {similarAddresses.map((addr, idx) => (
-                // key = idx는 임시
-                <AddressSelectButton key={idx} onClick={() => setIsOpen(false)}>
-                  {addr}
+              {pages
+                .flatMap((page) => page.documents)
+                .map((similarAddress, idx, arr) => (
+                                <AddressSelectButton
+key={
+                      similarAddress.address_name +
+                      similarAddress.x +
+                      similarAddress.y
+                    }
+                    ref={idx === arr.length - 1 ? lastSimilarAddressRef : null}
+onClick={() => setIsOpen(false)}
+>
+                  {similarAddress.addr}
                 </AddressSelectButton>
               ))}
             </ul>

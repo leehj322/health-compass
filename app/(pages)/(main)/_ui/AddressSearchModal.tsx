@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   Dialog,
@@ -51,6 +51,15 @@ export default function AddressSearchModal({}) {
     // isFetchingNextPage가 바뀔때 마다 observer를 바꿈
   }, [hasNextPage, isFetchingNextPage]);
 
+  const handleSubmitSearchInput = (
+    e: React.MouseEvent | React.KeyboardEvent,
+  ) => {
+    const isKeyboardEvent = "key" in e;
+    if (isKeyboardEvent && e.key !== "Enter") return;
+
+    setQuery(searchValue);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -80,13 +89,14 @@ export default function AddressSearchModal({}) {
                 placeholder="도로명 주소 또는 지번을 입력하세요"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={handleSubmitSearchInput}
                 className="pl-8"
               />
             </div>
             <Button
               variant="default"
               className="cursor-pointer"
-              onClick={() => setQuery(searchValue)}
+              onClick={handleSubmitSearchInput}
             >
               <Search className="mr-1" size={16} />
               검색
@@ -105,18 +115,18 @@ export default function AddressSearchModal({}) {
               {pages
                 .flatMap((page) => page.documents)
                 .map((similarAddress, idx, arr) => (
-                                <AddressSelectButton
-key={
+                  <AddressSelectButton
+                    key={
                       similarAddress.address_name +
                       similarAddress.x +
                       similarAddress.y
                     }
                     ref={idx === arr.length - 1 ? lastSimilarAddressRef : null}
-onClick={() => setIsOpen(false)}
->
-                  {similarAddress.addr}
-                </AddressSelectButton>
-              ))}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {similarAddress.address_name}
+                  </AddressSelectButton>
+                ))}
             </ul>
           )}
         </div>

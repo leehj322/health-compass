@@ -61,6 +61,7 @@ export default function AddressSearchModal({}) {
     if (isKeyboardEvent && e.key !== "Enter") return;
 
     setQuery(searchValue);
+    setSearchValue("");
   };
 
   const handleAddressSelected = (x: string, y: string) => {

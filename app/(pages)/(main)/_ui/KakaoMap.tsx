@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/unifiedLocationApi.type";
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
+import Spinner from "@/app/_ui/shared/Spinner";
 
 const MARKER_OPTIONS = [
   { id: "hospital", label: "병원" },
@@ -61,7 +62,12 @@ export default function KakaoMap({
     [map.ref], // if 문에서 비교를 위한 deps
   );
 
-  if (isError) return <div>카카오맵 API 에러</div>;
+  if (isError)
+    return (
+      <div className="flex h-[50vh] w-full items-center justify-center bg-gray-50 text-sm text-gray-500 md:h-full md:w-2/3">
+        지도를 불러오는 데 문제가 발생했어요.
+      </div>
+    );
 
   if (isLoading)
     return (
@@ -71,7 +77,7 @@ export default function KakaoMap({
         {...props}
       >
         <div className="flex h-full w-full items-center justify-center">
-          Loading...
+          <Spinner />
         </div>
       </div>
     );

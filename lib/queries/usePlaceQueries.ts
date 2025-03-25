@@ -1,8 +1,4 @@
-import {
-  useQuery,
-  UseQueryOptions,
-  useInfiniteQuery,
-} from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { QUERY_KEYS } from "./queryKeys";
 import {
   getPlacesByLocation,
@@ -33,19 +29,20 @@ export const usePlacesByLocation = (
 };
 
 export const usePlacesByKeyword = (
-  lat: number,
-  lng: number,
+  lat: number | undefined,
+  lng: number | undefined,
   radius: number = 1000,
-  page: number = 1,
   keyword: string = "",
-  options?: Omit<
-    UseQueryOptions<PlacesByKeywordResponse>,
-    "queryKey" | "queryFn"
-  >,
+  enabled: boolean,
 ) => {
-  return useQuery<PlacesByKeywordResponse>({
-    queryKey: QUERY_KEYS.places.byKeyword(lat, lng, radius, page, keyword),
-    queryFn: () => getPlacesByKeyword(lat, lng, radius, page, keyword),
-    ...options,
+  return useInfiniteQuery<PlacesByKeywordResponse>({
+    queryKey: QUERY_KEYS.places.byKeyword(lat!, lng!, radius, keyword),
+    queryFn: ({ pageParam }) =>
+      getPlacesByKeyword(lat!, lng!, radius, pageParam as number, keyword),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.meta.is_end ? undefined : allPages.length + 1;
+    },
+    enabled,
   });
 };

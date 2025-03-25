@@ -2,8 +2,6 @@
 
 import React, { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
 import {
   PlacesByLocationResponse,
@@ -12,11 +10,6 @@ import {
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
 import Spinner from "@/app/_ui/shared/Spinner";
-
-const MARKER_OPTIONS = [
-  { id: "hospital", label: "병원" },
-  { id: "pharmacy", label: "약국" },
-];
 
 const MARKER_SRC = {
   me: "/markers/home.png",
@@ -110,9 +103,6 @@ export default function KakaoMap({
           <MapMarkers places={pharmacies.places} variant="pharmacy" />
         )}
       </Map>
-
-      {/* 지도 위 마커 타입 필터 */}
-      <MarkerFilter />
     </div>
   );
 }
@@ -140,30 +130,4 @@ function MapMarkers({ places, variant }: MapMarkersProps) {
       }}
     />
   ));
-}
-
-function MarkerFilter() {
-  const { activeTab, setActiveTab } = useMainPageStore();
-
-  return (
-    <div className="absolute top-4 left-4 z-10 flex space-x-2 rounded-xl bg-white p-2 shadow-md">
-      <RadioGroup
-        value={activeTab}
-        onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-      >
-        {MARKER_OPTIONS.map((option) => (
-          <div key={option.id} className="flex items-center space-x-2">
-            <RadioGroupItem
-              id={option.id}
-              value={option.id}
-              className="cursor-pointer"
-            />
-            <Label htmlFor={option.id} className="cursor-pointer text-sm">
-              {option.label}
-            </Label>
-          </div>
-        ))}
-      </RadioGroup>
-    </div>
-  );
 }

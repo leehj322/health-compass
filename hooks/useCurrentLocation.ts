@@ -1,8 +1,9 @@
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function useCurrentLocation() {
   const { geoLocation, setGeoLocation } = useGeoLocationStore();
+  const [isAutoLoaded, setIsAutoLoaded] = useState(false);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -16,6 +17,7 @@ export default function useCurrentLocation() {
         if (success.coords.accuracy < 100) {
           const { latitude, longitude } = success.coords;
           setGeoLocation({ lat: latitude, lng: longitude });
+          setIsAutoLoaded(true);
         } else {
           console.log("위치 정보가 정확하지 않습니다 직접 입력 해주세요.");
         }
@@ -29,4 +31,6 @@ export default function useCurrentLocation() {
       },
     );
   }, []);
+
+  return { geoLocation, setGeoLocation, isAutoLoaded };
 }

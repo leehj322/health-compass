@@ -29,6 +29,8 @@ interface MainPageState {
   map: MapControlState;
   activeTab: "hospital" | "pharmacy";
   setActiveTab: (tab: "hospital" | "pharmacy") => void;
+  isSearchMode: boolean;
+  setIsSearchMode: (isSearchMode: boolean) => void;
 }
 
 export const useMainPageStore = create<MainPageState>((set) => ({
@@ -81,4 +83,6 @@ export const useMainPageStore = create<MainPageState>((set) => ({
   },
   activeTab: "hospital",
   setActiveTab: (tab) => set({ activeTab: tab }),
+  isSearchMode: true,
+  setIsSearchMode: (isSearchMode) => set({ isSearchMode }),
 }));

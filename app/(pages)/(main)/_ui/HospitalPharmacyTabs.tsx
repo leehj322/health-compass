@@ -16,6 +16,7 @@ interface HospitalPharmacyTabsProps {
   infiniteValues: {
     hospital: InfiniteQueryValues;
     pharmacy: InfiniteQueryValues;
+    search: InfiniteQueryValues;
   };
 }
 
@@ -24,7 +25,7 @@ export default function HospitalPharmacyTabs({
   pharmacies,
   infiniteValues,
 }: HospitalPharmacyTabsProps) {
-  const { activeTab, setActiveTab } = useMainPageStore();
+  const { activeTab, setActiveTab, isSearchMode } = useMainPageStore();
 
   return (
     <div className="flex-1 overflow-y-auto p-4">
@@ -62,7 +63,9 @@ export default function HospitalPharmacyTabs({
           <TabContentList
             type="hospital"
             data={hospitals}
-            infiniteQuery={infiniteValues.hospital}
+            infiniteQuery={
+              isSearchMode ? infiniteValues.search : infiniteValues.hospital
+            }
           />
         </TabsContent>
 
@@ -70,7 +73,9 @@ export default function HospitalPharmacyTabs({
           <TabContentList
             type="pharmacy"
             data={pharmacies}
-            infiniteQuery={infiniteValues.pharmacy}
+            infiniteQuery={
+              isSearchMode ? infiniteValues.search : infiniteValues.pharmacy
+            }
           />
         </TabsContent>
       </Tabs>

@@ -17,12 +17,14 @@ export default function SearchBar() {
     if (isKeyboardEvent && e.key !== "Enter") return;
 
     setIsSearchMode(true);
+
     // KakaoMap ref를 통해 현재 보여지는 지도의 중앙을 현재 위치 정보로 설정하고 검색
     if (map.ref) {
       const center = map.ref.getCenter();
       setGeoLocation({ lat: center.getLat(), lng: center.getLng() });
     }
-    setFilterGroups("query", searchValue);
+    setFilterGroups("query", searchValue.trim());
+
     setSearchValue("");
   };
 

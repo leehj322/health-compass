@@ -63,7 +63,7 @@ export default function MainPage() {
     geoLocation?.lng,
     filterGroups.distance * 1000,
     filterGroups.query,
-    isSearchMode && !!filterGroups.query,
+    isSearchMode && !!filterGroups.query && !!geoLocation,
   );
 
   let hospitals, pharmacies;

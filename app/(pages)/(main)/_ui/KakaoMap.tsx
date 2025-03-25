@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -34,19 +34,11 @@ export default function KakaoMap({
   ref,
   ...props
 }: KakaoMapProps) {
-  const mapRef = useRef<kakao.maps.Map>(null);
   const { map, activeTab } = useMainPageStore();
   const { geoLocation } = useGeoLocationStore();
   const [isLoading, isError] = useKakaoLoader({
     appkey: process.env.NEXT_PUBLIC_KAKAO_JS_API_KEY!,
   });
-
-  // mapRef가 생성 되면 최초 한번 zustand에 등록
-  useEffect(() => {
-    if (mapRef.current) {
-      map.setRef(mapRef.current);
-    }
-  }, [mapRef.current]);
 
   // geoLocation값이 바뀌면 지도의 중앙을 업데이트
   useEffect(() => {
@@ -58,6 +50,17 @@ export default function KakaoMap({
     }
   }, [geoLocation]);
 
+  // Map이 마운트 되면서 ref가 할당될 때 실행되는 콜백 ref
+  const setMapRef = useCallback(
+    (element: kakao.maps.Map | null) => {
+      // map.ref가 null이 아닐 때 까지만 실행
+      if (element && element !== map.ref) {
+        map.setRef(element);
+      }
+    },
+    [map.ref], // if 문에서 비교를 위한 deps
+  );
+
   return (
     <div
       className="relative h-[50vh] w-full md:h-full md:w-2/3"
@@ -65,7 +68,7 @@ export default function KakaoMap({
       {...props}
     >
       {/* 카카오 지도 */}
-      <Map center={map.center} ref={mapRef} className="h-full w-full">
+      <Map center={map.center} ref={setMapRef} className="h-full w-full">
         {geoLocation && (
           <MapMarker
             position={{ lat: geoLocation.lat, lng: geoLocation.lng }}

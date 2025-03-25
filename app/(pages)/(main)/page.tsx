@@ -124,7 +124,7 @@ export default function MainPage() {
     } else if (firstCategory === CATEGORY_CODE.pharmacy) {
       setActiveTab("pharmacy");
     }
-  }, [infiniteSearchResults]);
+  }, [isSearchMode, infiniteSearchResults]);
 
   return (
     <div className="flex flex-col md:h-[calc(100vh-5rem)] md:flex-row">

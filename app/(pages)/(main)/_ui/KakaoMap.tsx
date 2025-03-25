@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -60,6 +60,21 @@ export default function KakaoMap({
     },
     [map.ref], // if 문에서 비교를 위한 deps
   );
+
+  if (isError) return <div>카카오맵 API 에러</div>;
+
+  if (isLoading)
+    return (
+      <div
+        className="relative h-[50vh] w-full bg-gray-100 md:h-full md:w-2/3"
+        ref={ref}
+        {...props}
+      >
+        <div className="flex h-full w-full items-center justify-center">
+          Loading...
+        </div>
+      </div>
+    );
 
   return (
     <div

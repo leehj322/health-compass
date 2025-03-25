@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import useCurrentLocation from "@/hooks/useCurrentLocation";
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import ScrollToTopButton from "@/app/_ui/shared/ScrollToTopButton";
@@ -13,11 +13,16 @@ import { useGeoLocationStore } from "@/stores/useGeoLocation";
 import { Meta } from "@/lib/api/kakaoLocal.type";
 
 export default function MainPage() {
-  const { filterGroups } = useMainPageStore();
+  const { filterGroups, isSearchMode, setIsSearchMode } = useMainPageStore();
   const topButtonTriggerRef = useRef<HTMLDivElement | null>(null);
-  const { geoLocation } = useGeoLocationStore();
+  const { geoLocation, isAutoLoaded } = useCurrentLocation();
 
-  useCurrentLocation();
+  // 첫 자동 위치 감지 성공 시 한 번만 검색 모드를 꺼줌
+  useEffect(() => {
+    if (isAutoLoaded) {
+      setIsSearchMode(false);
+    }
+  }, [isAutoLoaded]);
 
   const {
     data: infiniteHospitals,

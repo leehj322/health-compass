@@ -17,6 +17,7 @@ import { useLocationByAddress } from "@/lib/queries/useLocationByAddress";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
 import { cn } from "@/lib/utils";
 import { useMainPageStore } from "@/stores/useMainPageStore";
+import Spinner from "@/app/_ui/shared/Spinner";
 
 export default function AddressSearchModal({}) {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,13 +27,15 @@ export default function AddressSearchModal({}) {
   const { setGeoLocation } = useGeoLocationStore();
 
   // 무한 스크롤 로직
-  const lastSimilarAddressRef = useRef<HTMLButtonElement | null>(null);
+  const infiniteScrollTriggerRef = useRef<HTMLDivElement | null>(null);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useLocationByAddress(query);
   const pages = data?.pages;
 
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) return;
+
+    if (!infiniteScrollTriggerRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -43,13 +46,11 @@ export default function AddressSearchModal({}) {
       { threshold: 0.8 },
     );
 
-    if (lastSimilarAddressRef.current) {
-      observer.observe(lastSimilarAddressRef.current);
-    }
+    observer.observe(infiniteScrollTriggerRef.current);
 
     return () => {
-      if (lastSimilarAddressRef.current) {
-        observer.unobserve(lastSimilarAddressRef.current);
+      if (infiniteScrollTriggerRef.current) {
+        observer.unobserve(infiniteScrollTriggerRef.current);
       }
     };
     // 제일 첫 페이지에서는 hasNextPage가 바뀔때 observer를 등록
@@ -122,32 +123,39 @@ export default function AddressSearchModal({}) {
           </div>
         </div>
 
-        {/* 유사한 주소 리스트 */}
+        {/* 주소 검색 결과 */}
         <div className="max-h-40 space-y-2 overflow-y-auto">
           {pages == null ? (
             <SearchPlaceholder />
           ) : pages[0].documents.length === 0 ? (
             <NoSearchResult />
           ) : (
-            <ul>
-              {pages
-                .flatMap((page) => page.documents)
-                .map((similarAddress, idx, arr) => (
-                  <AddressSelectButton
-                    key={
-                      similarAddress.address_name +
-                      similarAddress.x +
-                      similarAddress.y
-                    }
-                    ref={idx === arr.length - 1 ? lastSimilarAddressRef : null}
-                    onClick={() =>
-                      handleAddressSelected(similarAddress.y, similarAddress.x)
-                    }
-                  >
-                    {similarAddress.address_name}
-                  </AddressSelectButton>
-                ))}
-            </ul>
+            <>
+              <ul>
+                {pages
+                  .flatMap((page) => page.documents)
+                  .map((similarAddress) => (
+                    <button
+                      key={similarAddress.address_name}
+                      onClick={() =>
+                        handleAddressSelected(
+                          similarAddress.y,
+                          similarAddress.x,
+                        )
+                      }
+                      className="border-muted w-full border-b px-2 py-3 text-left text-sm transition hover:cursor-pointer hover:bg-emerald-50"
+                    >
+                      {similarAddress.address_name}
+                    </button>
+                  ))}
+              </ul>
+              {/* 조건부 렌더링 (데이터 로딩중: Spinner, 다음페이지 있음: 빈 여백) */}
+              {isFetchingNextPage ? (
+                <Spinner className="mx-auto mt-2" />
+              ) : hasNextPage ? (
+                <div ref={infiniteScrollTriggerRef} className="mt-2 h-6" />
+              ) : null}
+            </>
           )}
         </div>
       </DialogContent>
@@ -170,23 +178,5 @@ function NoSearchResult() {
     <div className="text-muted-foreground py-4 text-center text-sm">
       검색 결과가 없습니다.
     </div>
-  );
-}
-
-type AddressSelectButtonProps = Omit<
-  React.ComponentProps<"button">,
-  "className"
->;
-
-function AddressSelectButton({ children, ...props }: AddressSelectButtonProps) {
-  return (
-    <li>
-      <button
-        {...props}
-        className="border-muted w-full border-b px-2 py-3 text-left text-sm transition hover:cursor-pointer hover:bg-emerald-50"
-      >
-        {children}
-      </button>
-    </li>
   );
 }

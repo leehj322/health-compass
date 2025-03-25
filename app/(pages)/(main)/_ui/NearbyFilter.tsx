@@ -1,13 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Filter, Moon, Music, Gift, BookOpen } from "lucide-react";
 import AddressSearchModal from "./AddressSearchModal";
+import { useDebouncedValue } from "@/hooks/useDebounce";
 
 export default function NearbyFilter() {
   const { filterGroups, setFilterGroups } = useMainPageStore();
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [distance, setDistance] = useState(filterGroups.distance || 1);
+  const debouncedDistance = useDebouncedValue(distance, 500);
+
+  // zustand의 상태값과 useState 값의 동기화
+  useEffect(() => {
+    if (filterGroups.distance !== distance) {
+      setDistance(filterGroups.distance);
+    }
+  }, [filterGroups.distance]);
+
+  // zustand의 상태값과 디바운스된 값의 동기화, API요청 발생
+  useEffect(() => {
+    if (debouncedDistance !== filterGroups.distance) {
+      setFilterGroups("distance", debouncedDistance);
+    }
+  }, [debouncedDistance, filterGroups.distance]);
 
   return (
     <div className="space-y-4 border-b p-4">
@@ -32,12 +49,10 @@ export default function NearbyFilter() {
               defaultValue={[1]}
               max={5}
               step={0.5}
-              onValueChange={(value) => setFilterGroups("distance", value[0])}
+              onValueChange={(value) => setDistance(value[0])}
               className="hover:cursor-pointer"
             />
-            <p className="mt-2 text-sm text-emerald-600">
-              {filterGroups.distance} km
-            </p>
+            <p className="mt-2 text-sm text-emerald-600">{distance} km</p>
           </div>
 
           {/* 영업시간 필터 */}

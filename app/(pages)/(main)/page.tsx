@@ -80,22 +80,14 @@ export default function MainPage() {
 
     if (firstCategoryGroup === CATEGORY_CODE.hospital) {
       hospitals = {
-        places: infiniteSearchResults.pages
-          .flatMap((page) => page.places)
-          .filter(
-            (place) => place.category_group_code === CATEGORY_CODE.hospital,
-          ),
+        places: infiniteSearchResults.pages.flatMap((page) => page.places),
         meta: { ...infiniteSearchResults.pages.at(-1)?.meta } as Meta,
       };
     }
 
     if (firstCategoryGroup === CATEGORY_CODE.pharmacy) {
       pharmacies = {
-        places: infiniteSearchResults.pages
-          .flatMap((page) => page.places)
-          .filter(
-            (place) => place.category_group_code === CATEGORY_CODE.pharmacy,
-          ),
+        places: infiniteSearchResults.pages.flatMap((page) => page.places),
         meta: { ...infiniteSearchResults.pages.at(-1)?.meta } as Meta,
       };
     }

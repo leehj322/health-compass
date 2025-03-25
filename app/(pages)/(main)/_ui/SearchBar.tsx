@@ -22,6 +22,7 @@ export default function SearchBar() {
       setGeoLocation({ lat: center.getLat(), lng: center.getLng() });
     }
     setFilterGroups("query", searchValue);
+    setSearchValue("");
   };
 
   return (

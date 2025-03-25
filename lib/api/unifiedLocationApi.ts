@@ -30,12 +30,13 @@ export const getPlacesByLocation = async (
     return { places: [], meta };
   }
 
-  const categoryCode = places[0].category_group_code;
   const placesSummary: PlaceDocumentSummary[] = places.map(extractPlaceSummary);
 
   // 공공 데이터 API 요청 병렬 처리
   const placesWithDetails = await Promise.all(
-    placesSummary.map((place) => enrichPlaceWithDetails(place, categoryCode)),
+    placesSummary.map((place) =>
+      enrichPlaceWithDetails(place, place.category_group_code),
+    ),
   );
 
   // 두 API Response를 합쳐서 반환
@@ -65,12 +66,13 @@ export const getPlacesByKeyword = async (
     return { places: [], meta };
   }
 
-  const categoryCode = places[0].category_group_code;
   const placesSummary: PlaceDocumentSummary[] = places.map(extractPlaceSummary);
 
   // 공공 데이터 API 요청 병렬 처리
   const placesWithDetails = await Promise.all(
-    placesSummary.map((place) => enrichPlaceWithDetails(place, categoryCode)),
+    placesSummary.map((place) =>
+      enrichPlaceWithDetails(place, place.category_group_code),
+    ),
   );
 
   // 두 API Response를 합쳐서 반환

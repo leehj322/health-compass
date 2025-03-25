@@ -25,7 +25,14 @@ export default function HospitalPharmacyTabs({
   pharmacies,
   infiniteValues,
 }: HospitalPharmacyTabsProps) {
-  const { activeTab, setActiveTab, isSearchMode } = useMainPageStore();
+  const { filterGroups, activeTab, setActiveTab, isSearchMode } =
+    useMainPageStore();
+
+  const isFiltered =
+    filterGroups.night ||
+    filterGroups.saturday ||
+    filterGroups.sunday ||
+    filterGroups.holiday;
 
   return (
     <div className="flex-1 overflow-y-auto p-4">
@@ -36,9 +43,11 @@ export default function HospitalPharmacyTabs({
         <span className="text-sm text-gray-500">
           총
           <span className="m-1">
-            {activeTab === "hospital"
-              ? hospitals?.meta.total_count || 0
-              : pharmacies?.meta.total_count || 0}
+            {isFiltered
+              ? "N"
+              : activeTab === "hospital"
+                ? hospitals?.meta.total_count || 0
+                : pharmacies?.meta.total_count || 0}
           </span>
           곳 검색됨
         </span>

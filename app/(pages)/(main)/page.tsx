@@ -16,7 +16,8 @@ import { Meta } from "@/lib/api/kakaoLocal.type";
 import { CATEGORY_CODE } from "@/constants/categoryCode";
 
 export default function MainPage() {
-  const { filterGroups, isSearchMode, setIsSearchMode } = useMainPageStore();
+  const { filterGroups, setActiveTab, isSearchMode, setIsSearchMode } =
+    useMainPageStore();
   const topButtonTriggerRef = useRef<HTMLDivElement | null>(null);
   const { geoLocation, isAutoLoaded } = useCurrentLocation();
 
@@ -70,11 +71,13 @@ export default function MainPage() {
 
   // 검색 모드일 경우, 첫 번째 검색 결과의 카테고리에 따라 병원 또는 약국 데이터만 필터링하여 표시합니다.
   // 내 주변 모드일 경우, 내 주변 병원과 약국 데이터를 모두 표시합니다.
-  if (isSearchMode) {
-    if (
-      infiniteSearchResults?.pages[0].places[0].category_group_code ===
-      CATEGORY_CODE.hospital
-    ) {
+  if (isSearchMode && infiniteSearchResults) {
+    const firstCategoryGroup = infiniteSearchResults.pages[0].places.find(
+      (place) =>
+        Object.values(CATEGORY_CODE).includes(place.category_group_code),
+    )?.category_group_code;
+
+    if (firstCategoryGroup === CATEGORY_CODE.hospital) {
       hospitals = {
         places: infiniteSearchResults.pages
           .flatMap((page) => page.places)
@@ -85,10 +88,7 @@ export default function MainPage() {
       };
     }
 
-    if (
-      infiniteSearchResults?.pages[0].places[0].category_group_code ===
-      CATEGORY_CODE.pharmacy
-    ) {
+    if (firstCategoryGroup === CATEGORY_CODE.pharmacy) {
       pharmacies = {
         places: infiniteSearchResults.pages
           .flatMap((page) => page.places)
@@ -109,6 +109,22 @@ export default function MainPage() {
       meta: infinitePharmacies.pages.at(-1)?.meta as Meta,
     };
   }
+
+  useEffect(() => {
+    if (!isSearchMode || !infiniteSearchResults) return;
+
+    const firstCategory = infiniteSearchResults.pages[0].places.find(
+      (place) =>
+        place.category_group_code === CATEGORY_CODE.hospital ||
+        place.category_group_code === CATEGORY_CODE.pharmacy,
+    )?.category_group_code;
+
+    if (firstCategory === CATEGORY_CODE.hospital) {
+      setActiveTab("hospital");
+    } else if (firstCategory === CATEGORY_CODE.pharmacy) {
+      setActiveTab("pharmacy");
+    }
+  }, [infiniteSearchResults]);
 
   return (
     <div className="flex flex-col md:h-[calc(100vh-5rem)] md:flex-row">

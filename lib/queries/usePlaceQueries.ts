@@ -18,6 +18,7 @@ export const usePlacesByLocation = (
   lng: number | undefined,
   radius: number = 1000,
   category: "hospital" | "pharmacy" = "hospital",
+  enabled: boolean,
 ) => {
   return useInfiniteQuery<PlacesByLocationResponse>({
     queryKey: QUERY_KEYS.places.byLocation(lat!, lng!, radius, category),
@@ -27,7 +28,7 @@ export const usePlacesByLocation = (
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.meta.is_end ? undefined : allPages.length + 1;
     },
-    enabled: !!(lat && lng),
+    enabled,
   });
 };
 

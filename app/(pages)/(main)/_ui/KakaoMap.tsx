@@ -2,20 +2,16 @@
 
 import React, { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
+import { Button } from "@/components/ui/button";
 import {
   PlacesByLocationResponse,
   PlaceWithDetails,
 } from "@/lib/api/unifiedLocationApi.type";
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
-
-const MARKER_OPTIONS = [
-  { id: "hospital", label: "병원" },
-  { id: "pharmacy", label: "약국" },
-];
+import { Home } from "lucide-react";
+import Spinner from "@/app/_ui/shared/Spinner";
 
 const MARKER_SRC = {
   me: "/markers/home.png",
@@ -61,7 +57,12 @@ export default function KakaoMap({
     [map.ref], // if 문에서 비교를 위한 deps
   );
 
-  if (isError) return <div>카카오맵 API 에러</div>;
+  if (isError)
+    return (
+      <div className="flex h-[50vh] w-full items-center justify-center bg-gray-50 text-sm text-gray-500 md:h-full md:w-2/3">
+        지도를 불러오는 데 문제가 발생했어요.
+      </div>
+    );
 
   if (isLoading)
     return (
@@ -71,7 +72,7 @@ export default function KakaoMap({
         {...props}
       >
         <div className="flex h-full w-full items-center justify-center">
-          Loading...
+          <Spinner />
         </div>
       </div>
     );
@@ -83,7 +84,12 @@ export default function KakaoMap({
       {...props}
     >
       {/* 카카오 지도 */}
-      <Map center={map.center} ref={setMapRef} className="h-full w-full">
+      <Map
+        center={map.center}
+        level={4}
+        ref={setMapRef}
+        className="h-full w-full"
+      >
         {geoLocation && (
           <MapMarker
             position={{ lat: geoLocation.lat, lng: geoLocation.lng }}
@@ -105,8 +111,22 @@ export default function KakaoMap({
         )}
       </Map>
 
-      {/* 지도 위 마커 타입 필터 */}
-      <MarkerFilter />
+      {/* 지도 중심 이동 버튼 */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          if (geoLocation && map.ref) {
+            map.ref.panTo(
+              new kakao.maps.LatLng(geoLocation.lat, geoLocation.lng),
+            );
+          }
+        }}
+        className="absolute top-4 left-4 z-10 bg-white shadow-md hover:cursor-pointer hover:bg-gray-100"
+      >
+        <Home size={16} />
+        지도 중심 이동
+      </Button>
     </div>
   );
 }
@@ -134,30 +154,4 @@ function MapMarkers({ places, variant }: MapMarkersProps) {
       }}
     />
   ));
-}
-
-function MarkerFilter() {
-  const { activeTab, setActiveTab } = useMainPageStore();
-
-  return (
-    <div className="absolute top-4 left-4 z-10 flex space-x-2 rounded-xl bg-white p-2 shadow-md">
-      <RadioGroup
-        value={activeTab}
-        onValueChange={(value) => setActiveTab(value as typeof activeTab)}
-      >
-        {MARKER_OPTIONS.map((option) => (
-          <div key={option.id} className="flex items-center space-x-2">
-            <RadioGroupItem
-              id={option.id}
-              value={option.id}
-              className="cursor-pointer"
-            />
-            <Label htmlFor={option.id} className="cursor-pointer text-sm">
-              {option.label}
-            </Label>
-          </div>
-        ))}
-      </RadioGroup>
-    </div>
-  );
 }

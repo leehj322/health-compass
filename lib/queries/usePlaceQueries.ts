@@ -25,6 +25,7 @@ export const usePlacesByLocation = (
       return lastPage.meta.is_end ? undefined : allPages.length + 1;
     },
     enabled,
+    staleTime: 6 * 1000 * 10,
   });
 };
 
@@ -44,5 +45,6 @@ export const usePlacesByKeyword = (
       return lastPage.meta.is_end ? undefined : allPages.length + 1;
     },
     enabled,
+    staleTime: 6 * 1000 * 10,
   });
 };

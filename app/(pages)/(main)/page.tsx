@@ -15,6 +15,7 @@ import {
 import { Meta } from "@/lib/api/kakaoLocal.type";
 import { CATEGORY_CODE } from "@/constants/categoryCode";
 import { filterByDutyTime } from "@/utils/filterByDutyTime";
+import LoadingOverlay from "@/app/_ui/shared/LoadingOverlay";
 
 export default function MainPage() {
   const { filterGroups, setActiveTab, isSearchMode, setIsSearchMode } =
@@ -33,6 +34,7 @@ export default function MainPage() {
     data: infiniteHospitals,
     fetchNextPage: fetchNextHospitalsPage,
     hasNextPage: hasNextHospitalsPage,
+    isFetching: isFetchingHospitals,
     isFetchingNextPage: isFetchingNextHospitalsPage,
   } = usePlacesByLocation(
     geoLocation?.lat,
@@ -46,6 +48,7 @@ export default function MainPage() {
     data: infinitePharmacies,
     fetchNextPage: fetchNextPharmaciesPage,
     hasNextPage: hasNextPharmaciesPage,
+    isFetching: isFetchingPharmacies,
     isFetchingNextPage: isFetchingNextPharmaciesPage,
   } = usePlacesByLocation(
     geoLocation?.lat,
@@ -59,6 +62,7 @@ export default function MainPage() {
     data: infiniteSearchResults,
     fetchNextPage: fetchNextSearchResultsPage,
     hasNextPage: hasNextSearchResultsPage,
+    isFetching: isFetchingSearchResults,
     isFetchingNextPage: isFetchingNextSearchResultsPage,
   } = usePlacesByKeyword(
     geoLocation?.lat,
@@ -124,42 +128,47 @@ export default function MainPage() {
   const filteredPharmacies = filterByDutyTime(pharmacies, filterGroups);
 
   return (
-    <div className="flex flex-col md:h-[calc(100vh-5rem)] md:flex-row">
-      {/* Left: Kakao Map */}
-      <KakaoMap
-        hospitals={filteredHospitals}
-        pharmacies={filteredPharmacies}
-        ref={topButtonTriggerRef}
-      />
-
-      {/* Right: Sidebar (Bottom Menu on Mobile) */}
-      <div className="flex h-1/2 w-full flex-col border-l bg-white md:h-full md:w-1/3">
-        <SearchBar />
-        <NearbyFilter />
-        <HospitalPharmacyTabs
+    <>
+      {(isFetchingHospitals ||
+        isFetchingPharmacies ||
+        isFetchingSearchResults) && <LoadingOverlay />}
+      <div className="flex flex-col md:h-[calc(100vh-5rem)] md:flex-row">
+        {/* Left: Kakao Map */}
+        <KakaoMap
           hospitals={filteredHospitals}
           pharmacies={filteredPharmacies}
-          infiniteValues={{
-            hospital: {
-              fetchNextPage: fetchNextHospitalsPage,
-              hasNextPage: hasNextHospitalsPage,
-              isFetchingNextPage: isFetchingNextHospitalsPage,
-            },
-            pharmacy: {
-              fetchNextPage: fetchNextPharmaciesPage,
-              hasNextPage: hasNextPharmaciesPage,
-              isFetchingNextPage: isFetchingNextPharmaciesPage,
-            },
-            search: {
-              fetchNextPage: fetchNextSearchResultsPage,
-              hasNextPage: hasNextSearchResultsPage,
-              isFetchingNextPage: isFetchingNextSearchResultsPage,
-            },
-          }}
+          ref={topButtonTriggerRef}
         />
-      </div>
 
-      <ScrollToTopButton triggerRef={topButtonTriggerRef} />
-    </div>
+        {/* Right: Sidebar (Bottom Menu on Mobile) */}
+        <div className="flex h-1/2 w-full flex-col border-l bg-white md:h-full md:w-1/3">
+          <SearchBar />
+          <NearbyFilter />
+          <HospitalPharmacyTabs
+            hospitals={filteredHospitals}
+            pharmacies={filteredPharmacies}
+            infiniteValues={{
+              hospital: {
+                fetchNextPage: fetchNextHospitalsPage,
+                hasNextPage: hasNextHospitalsPage,
+                isFetchingNextPage: isFetchingNextHospitalsPage,
+              },
+              pharmacy: {
+                fetchNextPage: fetchNextPharmaciesPage,
+                hasNextPage: hasNextPharmaciesPage,
+                isFetchingNextPage: isFetchingNextPharmaciesPage,
+              },
+              search: {
+                fetchNextPage: fetchNextSearchResultsPage,
+                hasNextPage: hasNextSearchResultsPage,
+                isFetchingNextPage: isFetchingNextSearchResultsPage,
+              },
+            }}
+          />
+        </div>
+
+        <ScrollToTopButton triggerRef={topButtonTriggerRef} />
+      </div>
+    </>
   );
 }

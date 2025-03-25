@@ -3,12 +3,14 @@
 import React, { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
+import { Button } from "@/components/ui/button";
 import {
   PlacesByLocationResponse,
   PlaceWithDetails,
 } from "@/lib/api/unifiedLocationApi.type";
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
+import { Home } from "lucide-react";
 import Spinner from "@/app/_ui/shared/Spinner";
 
 const MARKER_SRC = {
@@ -82,7 +84,12 @@ export default function KakaoMap({
       {...props}
     >
       {/* 카카오 지도 */}
-      <Map center={map.center} ref={setMapRef} className="h-full w-full">
+      <Map
+        center={map.center}
+        level={4}
+        ref={setMapRef}
+        className="h-full w-full"
+      >
         {geoLocation && (
           <MapMarker
             position={{ lat: geoLocation.lat, lng: geoLocation.lng }}
@@ -103,6 +110,23 @@ export default function KakaoMap({
           <MapMarkers places={pharmacies.places} variant="pharmacy" />
         )}
       </Map>
+
+      {/* 지도 중심 이동 버튼 */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          if (geoLocation && map.ref) {
+            map.ref.panTo(
+              new kakao.maps.LatLng(geoLocation.lat, geoLocation.lng),
+            );
+          }
+        }}
+        className="absolute top-4 left-4 z-10 bg-white shadow-md hover:cursor-pointer hover:bg-gray-100"
+      >
+        <Home size={16} />
+        지도 중심 이동
+      </Button>
     </div>
   );
 }

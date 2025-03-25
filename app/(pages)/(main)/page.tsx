@@ -14,6 +14,7 @@ import {
 } from "@/lib/queries/usePlaceQueries";
 import { Meta } from "@/lib/api/kakaoLocal.type";
 import { CATEGORY_CODE } from "@/constants/categoryCode";
+import { filterByDutyTime } from "@/utils/filterByDutyTime";
 
 export default function MainPage() {
   const { filterGroups, setActiveTab, isSearchMode, setIsSearchMode } =
@@ -79,22 +80,14 @@ export default function MainPage() {
 
     if (firstCategoryGroup === CATEGORY_CODE.hospital) {
       hospitals = {
-        places: infiniteSearchResults.pages
-          .flatMap((page) => page.places)
-          .filter(
-            (place) => place.category_group_code === CATEGORY_CODE.hospital,
-          ),
+        places: infiniteSearchResults.pages.flatMap((page) => page.places),
         meta: { ...infiniteSearchResults.pages.at(-1)?.meta } as Meta,
       };
     }
 
     if (firstCategoryGroup === CATEGORY_CODE.pharmacy) {
       pharmacies = {
-        places: infiniteSearchResults.pages
-          .flatMap((page) => page.places)
-          .filter(
-            (place) => place.category_group_code === CATEGORY_CODE.pharmacy,
-          ),
+        places: infiniteSearchResults.pages.flatMap((page) => page.places),
         meta: { ...infiniteSearchResults.pages.at(-1)?.meta } as Meta,
       };
     }
@@ -126,12 +119,16 @@ export default function MainPage() {
     }
   }, [isSearchMode, infiniteSearchResults]);
 
+  // 데이터 필터링 (제공하는 API 특성상 결과값을 10개씩 띄우기가 불가능)
+  const filteredHospitals = filterByDutyTime(hospitals, filterGroups);
+  const filteredPharmacies = filterByDutyTime(pharmacies, filterGroups);
+
   return (
     <div className="flex flex-col md:h-[calc(100vh-5rem)] md:flex-row">
       {/* Left: Kakao Map */}
       <KakaoMap
-        hospitals={hospitals}
-        pharmacies={pharmacies}
+        hospitals={filteredHospitals}
+        pharmacies={filteredPharmacies}
         ref={topButtonTriggerRef}
       />
 
@@ -140,8 +137,8 @@ export default function MainPage() {
         <SearchBar />
         <NearbyFilter />
         <HospitalPharmacyTabs
-          hospitals={hospitals}
-          pharmacies={pharmacies}
+          hospitals={filteredHospitals}
+          pharmacies={filteredPharmacies}
           infiniteValues={{
             hospital: {
               fetchNextPage: fetchNextHospitalsPage,

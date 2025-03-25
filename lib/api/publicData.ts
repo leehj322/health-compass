@@ -4,7 +4,9 @@ export const getHospitalDetailsByName = async (name: string, addr?: string) => {
   // QN 파라미터에 공백 등이 포함될 수 있어 encodeURIComponent 적용
   let query = `serviceKey=${process.env.NEXT_PUBLIC_DATA_GO_KR_API_KEY}&QN=${encodeURIComponent(name)}`;
   if (addr) {
-    query += `&Q0=${addr.split(" ")[0]}`;
+    const splittedAddress = addr.split(" ");
+    query += `&Q0=${splittedAddress[0]}`;
+    query += `&Q0=${splittedAddress[1]}`;
   }
 
   const res = await fetch(
@@ -30,7 +32,9 @@ export const getPharmacyDetailsByName = async (name: string, addr?: string) => {
   // QN 파라미터에 공백 등이 포함될 수 있어 encodeURIComponent 적용
   let query = `serviceKey=${process.env.NEXT_PUBLIC_DATA_GO_KR_API_KEY}&QN=${encodeURIComponent(name)}`;
   if (addr) {
-    query += `&Q0=${addr.split(" ")[0]}`;
+    const splittedAddress = addr.split(" ");
+    query += `&Q0=${splittedAddress[0]}`;
+    query += `&Q0=${splittedAddress[1]}`;
   }
 
   const res = await fetch(

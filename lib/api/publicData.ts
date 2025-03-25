@@ -6,7 +6,7 @@ export const getHospitalDetailsByName = async (name: string, addr?: string) => {
   if (addr) {
     const splittedAddress = addr.split(" ");
     query += `&Q0=${splittedAddress[0]}`;
-    query += `&Q0=${splittedAddress[1]}`;
+    query += `&Q1=${splittedAddress[1]}`;
   }
 
   const res = await fetch(
@@ -34,7 +34,7 @@ export const getPharmacyDetailsByName = async (name: string, addr?: string) => {
   if (addr) {
     const splittedAddress = addr.split(" ");
     query += `&Q0=${splittedAddress[0]}`;
-    query += `&Q0=${splittedAddress[1]}`;
+    query += `&Q1=${splittedAddress[1]}`;
   }
 
   const res = await fetch(

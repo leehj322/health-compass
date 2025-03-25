@@ -14,6 +14,7 @@ import {
 } from "@/lib/queries/usePlaceQueries";
 import { Meta } from "@/lib/api/kakaoLocal.type";
 import { CATEGORY_CODE } from "@/constants/categoryCode";
+import { filterByDutyTime } from "@/utils/filterByDutyTime";
 
 export default function MainPage() {
   const { filterGroups, setActiveTab, isSearchMode, setIsSearchMode } =
@@ -126,12 +127,16 @@ export default function MainPage() {
     }
   }, [isSearchMode, infiniteSearchResults]);
 
+  // 데이터 필터링 (제공하는 API 특성상 결과값을 10개씩 띄우기가 불가능)
+  const filteredHospitals = filterByDutyTime(hospitals, filterGroups);
+  const filteredPharmacies = filterByDutyTime(pharmacies, filterGroups);
+
   return (
     <div className="flex flex-col md:h-[calc(100vh-5rem)] md:flex-row">
       {/* Left: Kakao Map */}
       <KakaoMap
-        hospitals={hospitals}
-        pharmacies={pharmacies}
+        hospitals={filteredHospitals}
+        pharmacies={filteredPharmacies}
         ref={topButtonTriggerRef}
       />
 
@@ -140,8 +145,8 @@ export default function MainPage() {
         <SearchBar />
         <NearbyFilter />
         <HospitalPharmacyTabs
-          hospitals={hospitals}
-          pharmacies={pharmacies}
+          hospitals={filteredHospitals}
+          pharmacies={filteredPharmacies}
           infiniteValues={{
             hospital: {
               fetchNextPage: fetchNextHospitalsPage,

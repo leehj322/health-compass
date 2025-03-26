@@ -6,11 +6,11 @@ export const getHospitalDetailsByName = async (name: string, addr?: string) => {
   if (addr) {
     const splittedAddress = addr.split(" ");
     query += `&Q0=${splittedAddress[0]}`;
-    query += `&Q0=${splittedAddress[1]}`;
+    query += `&Q1=${splittedAddress[1]}`;
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DATA_HOSPITAL_BASE_URL}/getHsptlMdcncListInfoInqire?${query}`,
+    `/api/public-data/hospital/getHsptlMdcncListInfoInqire?${query}`,
   );
 
   if (!res.ok) {
@@ -34,11 +34,11 @@ export const getPharmacyDetailsByName = async (name: string, addr?: string) => {
   if (addr) {
     const splittedAddress = addr.split(" ");
     query += `&Q0=${splittedAddress[0]}`;
-    query += `&Q0=${splittedAddress[1]}`;
+    query += `&Q1=${splittedAddress[1]}`;
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DATA_PHARMACY_BASE_URL}/getParmacyListInfoInqire?${query}`,
+    `/api/public-data/pharmacy/getParmacyListInfoInqire?${query}`,
   );
 
   if (!res.ok) {

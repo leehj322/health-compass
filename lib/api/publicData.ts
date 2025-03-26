@@ -10,7 +10,7 @@ export const getHospitalDetailsByName = async (name: string, addr?: string) => {
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DATA_HOSPITAL_BASE_URL}/getHsptlMdcncListInfoInqire?${query}`,
+    `/api/public-data/hospital/getHsptlMdcncListInfoInqire?${query}`,
   );
 
   if (!res.ok) {
@@ -38,7 +38,7 @@ export const getPharmacyDetailsByName = async (name: string, addr?: string) => {
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DATA_PHARMACY_BASE_URL}/getParmacyListInfoInqire?${query}`,
+    `/api/public-data/pharmacy/getParmacyListInfoInqire?${query}`,
   );
 
   if (!res.ok) {

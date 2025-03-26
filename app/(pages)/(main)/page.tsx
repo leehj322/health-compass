@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import useCurrentLocation from "@/hooks/useCurrentLocation";
+import { useCurrentLocation } from "@/hooks/useCurrentLocation";
 import { useMainPageStore } from "@/stores/useMainPageStore";
 import ScrollToTopButton from "@/app/_ui/shared/ScrollToTopButton";
 import KakaoMap from "./_ui/KakaoMap";

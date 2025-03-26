@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Providers from "./providers";
 import "./globals.css";
 import Navbar from "./_ui/layout/Navbar";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "건강 나침반",
@@ -20,6 +21,7 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           {children}
+          <Toaster expand={true} richColors />
         </Providers>
       </body>
     </html>

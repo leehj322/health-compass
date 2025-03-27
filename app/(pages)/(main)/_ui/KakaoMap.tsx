@@ -12,12 +12,7 @@ import { useMainPageStore } from "@/stores/useMainPageStore";
 import { useGeoLocationStore } from "@/stores/useGeoLocation";
 import { Home } from "lucide-react";
 import Spinner from "@/app/_ui/shared/Spinner";
-
-const MARKER_SRC = {
-  me: "/markers/home.png",
-  hospital: "/markers/hospital.png",
-  pharmacy: "/markers/pharmacy.png",
-};
+import { MARKER_SRC } from "@/constants/markerSrc";
 
 interface KakaoMapProps extends React.ComponentProps<"div"> {
   hospitals?: PlacesByLocationResponse;

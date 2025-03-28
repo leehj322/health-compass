@@ -13,16 +13,16 @@ import {
 import { PlaceDocument } from "@/lib/api/kakaoLocal.type";
 import { PublicDataItem } from "@/lib/api/publicData.type";
 
-interface PlaceDetailPageProps {
-  params: { id: string };
-  searchParams: {
+type PlaceDetailPageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{
     x?: string;
     y?: string;
     name?: string;
     addr?: string;
     code?: string;
-  };
-}
+  }>;
+};
 
 export default async function PlaceDetailPage({
   params,

@@ -7,6 +7,7 @@ import {
 import Link from "next/link";
 import { formatDistance } from "@/utils/formatDistance";
 import { PlaceWithDetails } from "@/lib/api/unifiedLocationApi.type";
+import { buildPlaceDetailQuery } from "@/utils/buildQueryString";
 
 interface HospitalPharmacyCardProps {
   place: PlaceWithDetails;
@@ -15,9 +16,11 @@ interface HospitalPharmacyCardProps {
 export default function HospitalPharmacyCard({
   place,
 }: HospitalPharmacyCardProps) {
+  const query = buildPlaceDetailQuery(place);
+
   return (
     <li>
-      <Link href={`/clinic/${place.id}`}>
+      <Link href={`/clinic/${place.id}?${query}`}>
         <Card className="relative py-3">
           <span className="text-muted-foreground absolute top-2 right-3 text-sm">
             {formatDistance(Number(place.distance)) || "? m"}

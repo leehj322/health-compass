@@ -10,8 +10,7 @@ export default function PlaceBasicInfo({ placeData }: PlaceBasicInfoProps) {
     { label: "분류", value: placeData.category_name },
     { label: "주소", value: placeData.road_address_name },
     { label: "전화번호", value: placeData.phone },
-    { label: "거리", value: `${placeData.distance}m` },
-    { label: "웹사이트", value: `${placeData.place_url}m` },
+    { label: "카카오맵", value: `${placeData.place_url}m` },
   ];
 
   return (
@@ -22,7 +21,7 @@ export default function PlaceBasicInfo({ placeData }: PlaceBasicInfoProps) {
       {infoList.map((item) => (
         <p key={item.label} className="text-sm text-gray-600">
           <span className="mr-1 font-medium text-gray-800">{item.label}:</span>
-          {item.label === "웹사이트" ? (
+          {item.label === "카카오맵" ? (
             <Link
               href={placeData.place_url}
               target="_blank"

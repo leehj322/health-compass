@@ -1,6 +1,11 @@
 import { parseStringPromise } from "xml2js";
+import { PublicDataResponse, PublicDataItem } from "./publicData.type";
 
-export const getHospitalDetailsByName = async (name: string, addr?: string) => {
+export const getHospitalDetailsByName = async (
+  name: string,
+  addr: string,
+  from: "server" | "client" = "client",
+): Promise<PublicDataResponse> => {
   // QN 파라미터에 공백 등이 포함될 수 있어 encodeURIComponent 적용
   let query = `serviceKey=${process.env.NEXT_PUBLIC_DATA_GO_KR_API_KEY}&QN=${encodeURIComponent(name)}`;
   if (addr) {
@@ -9,9 +14,16 @@ export const getHospitalDetailsByName = async (name: string, addr?: string) => {
     query += `&Q1=${splittedAddress[1]}`;
   }
 
-  const res = await fetch(
-    `/api/public-data/hospital/getHsptlMdcncListInfoInqire?${query}`,
-  );
+  let res;
+  if (from === "client") {
+    res = await fetch(
+      `/api/public-data/hospital/getHsptlMdcncListInfoInqire?${query}`,
+    );
+  } else {
+    res = await fetch(
+      `${process.env.NEXT_PUBLIC_DATA_HOSPITAL_BASE_URL}/getHsptlMdcncListInfoInqire?${query}`,
+    );
+  }
 
   if (!res.ok) {
     throw new Error(
@@ -25,10 +37,17 @@ export const getHospitalDetailsByName = async (name: string, addr?: string) => {
     trim: true,
   });
 
-  return jsonData.response?.body?.items?.item;
+  const item = jsonData.response?.body?.items?.item;
+
+  if (!item) return null;
+  return (Array.isArray(item) ? item[0] : item) as PublicDataItem;
 };
 
-export const getPharmacyDetailsByName = async (name: string, addr?: string) => {
+export const getPharmacyDetailsByName = async (
+  name: string,
+  addr: string,
+  from: "server" | "client" = "client",
+): Promise<PublicDataResponse> => {
   // QN 파라미터에 공백 등이 포함될 수 있어 encodeURIComponent 적용
   let query = `serviceKey=${process.env.NEXT_PUBLIC_DATA_GO_KR_API_KEY}&QN=${encodeURIComponent(name)}`;
   if (addr) {
@@ -37,9 +56,16 @@ export const getPharmacyDetailsByName = async (name: string, addr?: string) => {
     query += `&Q1=${splittedAddress[1]}`;
   }
 
-  const res = await fetch(
-    `/api/public-data/pharmacy/getParmacyListInfoInqire?${query}`,
-  );
+  let res;
+  if (from === "client") {
+    res = await fetch(
+      `/api/public-data/pharmacy/getParmacyListInfoInqire?${query}`,
+    );
+  } else {
+    res = await fetch(
+      `${process.env.NEXT_PUBLIC_DATA_PHARMACY_BASE_URL}/getParmacyListInfoInqire?${query}`,
+    );
+  }
 
   if (!res.ok) {
     throw new Error(
@@ -53,5 +79,8 @@ export const getPharmacyDetailsByName = async (name: string, addr?: string) => {
     trim: true,
   });
 
-  return jsonData.response?.body?.items?.item;
+  const item = jsonData.response?.body?.items?.item;
+
+  if (!item) return null;
+  return (Array.isArray(item) ? item[0] : item) as PublicDataItem;
 };

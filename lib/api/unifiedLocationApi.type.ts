@@ -1,7 +1,7 @@
-import { PlaceDocumentSummary, Meta } from "./kakaoLocal.type";
+import { PlaceDocument, Meta } from "./kakaoLocal.type";
 
 // 카카오 로컬 API 데이터 + 공공 데이터
-export interface PlaceWithDetails extends PlaceDocumentSummary {
+export interface PlaceWithDetails extends PlaceDocument {
   details: Record<string, string> | null; // 공공 데이터 response가 데이터마다 전부 달라서 Record로 처리
 }
 

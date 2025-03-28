@@ -31,8 +31,9 @@ export interface LocationSearchResultByAddress {
   road_address: RoadAddress | null;
 }
 
-export interface PlaceDocumentSummary {
+export interface PlaceDocument {
   road_address_name: string;
+  address_name: string;
   category_name: string;
   category_group_code: string;
   distance: string;
@@ -60,7 +61,12 @@ export interface LocationByAddressResponse {
   meta: Meta;
 }
 
+export interface PlacesByCategoryResponse {
+  documents: PlaceDocument[];
+  meta: Meta;
+}
+
 export interface PlacesByKeywordResponse {
-  documents: PlaceDocumentSummary[];
+  documents: PlaceDocument[];
   meta: Meta;
 }

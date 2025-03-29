@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     // UNKNOWN_ERROR: 기본 에러 코드 및 메시지 (아래 조건에 해당하지 않는 경우)
     let code = "UNKNOWN_ERROR";
-    let message = "회원가입에 실패했습니다.";
+    let message = error.message;
 
     // USER_ALREADY_EXISTS: 이미 가입된 이메일인 경우
     // 이메일 인증을 비활성화한 상태에서 중복 이메일 가입 시 발생

@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/app/_ui/shared/Spinner";
+import PasswordRuleList from "./PasswordRuleList";
 import { PASSWORD_REGEX } from "@/constants/regex";
 
 const signUpFormSchema = z
@@ -93,7 +94,12 @@ export default function SignUpForm() {
             name="password"
             render={({ field }) => (
               <FormItem className="gap-1">
-                <FormLabel className="mb-1 ml-1 font-bold">비밀번호</FormLabel>
+                <FormLabel className="mb-1 ml-1 font-bold">
+                  <div className="flex items-center gap-1">
+                    <p>비밀번호</p>
+                    <PasswordRuleList />
+                  </div>
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="password"

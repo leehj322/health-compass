@@ -36,7 +36,9 @@ export async function POST(req: Request) {
       { success: false, code, message },
       { status: 400 },
     );
-  } catch (_) {
+  } catch (error) {
+    console.error("로그인 에러: ", error);
+
     return NextResponse.json(
       {
         success: false,

@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       { success: false, code, message },
       { status: 400 },
     );
-  } catch (error) {
+  } catch (_) {
     return NextResponse.json(
       {
         success: false,

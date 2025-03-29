@@ -4,6 +4,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Form,
   FormField,
@@ -16,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/app/_ui/shared/Spinner";
 import { PASSWORD_REGEX } from "@/constants/regex";
+import { useSignin } from "@/lib/queries/useAuthQueries";
 
 const signInFormSchema = z.object({
   email: z
@@ -30,6 +32,7 @@ const signInFormSchema = z.object({
 
 export default function SignInForm() {
   const [formError, setFormError] = useState<string | null>(null);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
@@ -40,8 +43,21 @@ export default function SignInForm() {
     },
   });
 
-  const onSubmit = () => {
-    console.log("submit!!!");
+  const { mutate: signIn, isPending } = useSignin();
+
+  const onSubmit = (data: z.infer<typeof signInFormSchema>) => {
+    signIn(
+      { email: data.email, password: data.password },
+      {
+        onSuccess: () => {
+          alert("로그인 성공");
+          router.push("/");
+        },
+        onError: (error) => {
+          setFormError(error.message);
+        },
+      },
+    );
   };
 
   return (
@@ -101,10 +117,10 @@ export default function SignInForm() {
 
           <Button
             type="submit"
-            disabled={form.formState.isSubmitting}
+            disabled={!form.formState.isValid || isPending}
             className="mt-3 h-10 w-full cursor-pointer rounded-md bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700"
           >
-            {form.formState.isSubmitting ? <Spinner /> : "로그인"}
+            {isPending ? <Spinner /> : "로그인"}
           </Button>
         </form>
       </Form>

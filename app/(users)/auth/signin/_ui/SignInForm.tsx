@@ -1,23 +1,42 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Spinner from "@/app/_ui/shared/Spinner";
+
+const signInFormSchema = z.object({
+  email: z.string().email("이메일을 입력해주세요."),
+  password: z.string().min(1, "비밀번호를 입력해주세요."),
+  passwordConfirm: z.string(),
+});
 
 export default function SignInForm() {
-  const errors = {
-    email: {
-      message: "에러 메세지",
-    },
-    password: {
-      message: null,
-    },
-    passwordConfirm: {
-      message: null,
-    },
-  };
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const formError = null;
+  const form = useForm<z.infer<typeof signInFormSchema>>({
+    resolver: zodResolver(signInFormSchema),
+    mode: "onSubmit",
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = () => {
+    console.log("submit!!!");
+  };
 
   return (
     <>
@@ -26,47 +45,63 @@ export default function SignInForm() {
           {formError}
         </p>
       )}
-      <form className="w-full max-w-md space-y-2">
-        <div className="space-y-2">
-          <Label htmlFor="email" className="mb-3 ml-1 font-bold">
-            이메일
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="your@email.com"
-            className="mb-1 h-10 placeholder:text-sm"
-          />
-          <p className="h-2 text-right text-xs text-red-500">
-            {errors.email.message ?? (
-              <span className="invisible">placeholder</span>
-            )}
-          </p>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password" className="mb-3 ml-1 font-bold">
-            비밀번호
-          </Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="비밀번호 입력"
-            className="mb-1 h-10 placeholder:text-sm"
-          />
-          <p className="h-2 text-right text-xs text-red-500">
-            {errors.password.message ?? (
-              <span className="invisible">placeholder</span>
-            )}
-          </p>
-        </div>
-        {/* 일반 가입 버튼 */}
-        <Button
-          type="submit"
-          className="mt-3 h-10 w-full cursor-pointer rounded-md bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700"
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full max-w-md space-y-2"
         >
-          로그인
-        </Button>
-      </form>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="gap-1">
+                <FormLabel className="mb-1 ml-1 font-bold">이메일</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="your@email.com"
+                    className="h-10 placeholder:text-sm"
+                    {...field}
+                  />
+                </FormControl>
+                <div className="h-2">
+                  <FormMessage className="text-right text-xs" />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="gap-1">
+                <FormLabel className="mb-1 ml-1 font-bold">비밀번호</FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="비밀번호 입력"
+                    className="h-10 placeholder:text-sm"
+                    {...field}
+                  />
+                </FormControl>
+                <div className="h-2">
+                  <FormMessage className="text-right text-xs" />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            disabled={!form.formState.isValid || form.formState.isSubmitting}
+            className="mt-3 h-10 w-full cursor-pointer rounded-md bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700"
+          >
+            {form.formState.isSubmitting ? <Spinner /> : "로그인"}
+          </Button>
+        </form>
+      </Form>
     </>
   );
 }

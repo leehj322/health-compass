@@ -15,11 +15,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/app/_ui/shared/Spinner";
+import { PASSWORD_REGEX } from "@/constants/regex";
 
 const signInFormSchema = z.object({
-  email: z.string().email("이메일을 입력해주세요."),
-  password: z.string().min(1, "비밀번호를 입력해주세요."),
-  passwordConfirm: z.string(),
+  email: z
+    .string()
+    .min(1, "이메일을 입력해주세요.")
+    .email("이메일을 입력해주세요."),
+  password: z
+    .string()
+    .min(1, "비밀번호를 입력해주세요.")
+    .regex(PASSWORD_REGEX, "영문 대소문자, 숫자, 특수문자를 포함해야 합니다."),
 });
 
 export default function SignInForm() {
@@ -59,7 +65,7 @@ export default function SignInForm() {
                 <FormLabel className="mb-1 ml-1 font-bold">이메일</FormLabel>
                 <FormControl>
                   <Input
-                    type="email"
+                    type="text" // 브라우저 기본 email validation을 피하기 위해 type="text" 사용 (zod로 validation)
                     placeholder="your@email.com"
                     className="h-10 placeholder:text-sm"
                     {...field}
@@ -95,7 +101,7 @@ export default function SignInForm() {
 
           <Button
             type="submit"
-            disabled={!form.formState.isValid || form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting}
             className="mt-3 h-10 w-full cursor-pointer rounded-md bg-emerald-600 text-sm font-medium text-white hover:bg-emerald-700"
           >
             {form.formState.isSubmitting ? <Spinner /> : "로그인"}

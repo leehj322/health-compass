@@ -15,11 +15,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/app/_ui/shared/Spinner";
+import { PASSWORD_REGEX } from "@/constants/regex";
 
 const signUpFormSchema = z
   .object({
-    email: z.string().email("유효한 이메일을 입력해주세요."),
-    password: z.string().min(8, "8자 이상 입력해주세요."),
+    email: z
+      .string()
+      .min(1, "이메일을 입력해주세요.")
+      .email("유효한 이메일 형식이 아닙니다."),
+    password: z
+      .string()
+      .min(8, "비밀번호는 8자 이상이어야 합니다.")
+      .regex(
+        PASSWORD_REGEX,
+        "영문 대소문자, 숫자, 특수문자를 포함해야 합니다.",
+      ),
     passwordConfirm: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirm, {

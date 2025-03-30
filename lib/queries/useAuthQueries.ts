@@ -43,3 +43,18 @@ export const useSignin = () => {
     },
   });
 };
+
+export const useSignout = () => {
+  return useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed Signout");
+      }
+    },
+  });
+};

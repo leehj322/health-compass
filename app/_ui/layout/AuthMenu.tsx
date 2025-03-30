@@ -11,15 +11,42 @@ import { ErrorToast } from "@/lib/toasts";
 import Image from "next/image";
 import Link from "next/link";
 import Spinner from "../shared/Spinner";
-import { useRouter } from "next/navigation";
+import { LogIn } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@/lib/queries/useUserQueries";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 
-export default function UserMenu() {
-  const router = useRouter();
+export default function AuthMenu() {
+  const { data: user } = useUser();
+
+  return (
+    <>
+      {user ? (
+        <div
+          title="유저 메뉴"
+          aria-label="유저 메뉴"
+          className="flex items-center justify-center pl-1"
+        >
+          <ProfileMenu />
+        </div>
+      ) : (
+        <Link href="/auth/signin" title="로그인" aria-label="로그인">
+          <LogIn size={20} />
+        </Link>
+      )}
+    </>
+  );
+}
+
+function ProfileMenu() {
+  const queryClient = useQueryClient();
   const { mutate: signOut, isPending } = useSignout();
 
   const handleSignOut = () => {
     signOut(undefined, {
-      onSuccess: () => router.refresh(),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user.all });
+      },
       onError: (error) => {
         ErrorToast("로그아웃 실패", error.message);
       },

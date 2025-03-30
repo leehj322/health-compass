@@ -1,8 +1,14 @@
 import Link from "next/link";
 import NavMenu from "./NavMenu";
-import UserMenu from "./UserMenu";
-import { CircleHelp, Bell, LogIn } from "lucide-react";
+import AuthMenu from "./AuthMenu";
+import { CircleHelp, Bell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 
 const MENU_LIST = [
   { label: "병원 약국 찾기", href: "/", highlightPaths: ["/clinic"] },
@@ -12,9 +18,18 @@ const MENU_LIST = [
 
 export default async function Navbar() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: QUERY_KEYS.user.all,
+    queryFn: async () => {
+      const { data } = await supabase.auth.getUser();
+      return data.user;
+    },
+    staleTime: 60 * 1000,
+  });
+
+  const dehydrateState = dehydrate(queryClient);
 
   return (
     <nav className="sticky top-0 z-50 flex h-20 items-center justify-between bg-white px-6 py-6 shadow-sm md:px-20">
@@ -46,19 +61,11 @@ export default async function Navbar() {
             <CircleHelp size={20} />
           </Link>
 
-          {user ? (
-            <div
-              title="유저 메뉴"
-              aria-label="유저 메뉴"
-              className="flex items-center justify-center pl-1"
-            >
-              <UserMenu />
-            </div>
-          ) : (
-            <Link href="/auth/signin" title="로그인" aria-label="로그인">
-              <LogIn size={20} />
-            </Link>
-          )}
+          {/* 로그인한 경우: 프로필메뉴, 로그아웃한 경우: 로그인 페이지 아이콘 */}
+
+          <HydrationBoundary state={dehydrateState}>
+            <AuthMenu />
+          </HydrationBoundary>
         </li>
       </ul>
     </nav>

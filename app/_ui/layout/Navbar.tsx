@@ -1,6 +1,8 @@
 import Link from "next/link";
 import NavMenu from "./NavMenu";
-import { LogIn, CircleHelp, Bell } from "lucide-react";
+import UserMenu from "./UserMenu";
+import { CircleHelp, Bell, LogIn } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
 
 const MENU_LIST = [
   { label: "병원 약국 찾기", href: "/", highlightPaths: ["/clinic"] },
@@ -8,7 +10,12 @@ const MENU_LIST = [
   { label: "자유게시판", href: "/board", highlightPaths: [] },
 ];
 
-export default function Navbar() {
+export default async function Navbar() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <nav className="sticky top-0 z-50 flex h-20 items-center justify-between bg-white px-6 py-6 shadow-sm md:px-20">
       <div className="text-xl font-bold md:text-2xl">
@@ -38,9 +45,20 @@ export default function Navbar() {
           >
             <CircleHelp size={20} />
           </Link>
-          <Link href="/auth/signin" title="로그인" aria-label="로그인">
-            <LogIn size={20} />
-          </Link>
+
+          {user ? (
+            <div
+              title="유저 메뉴"
+              aria-label="유저 메뉴"
+              className="flex items-center justify-center pl-1"
+            >
+              <UserMenu />
+            </div>
+          ) : (
+            <Link href="/auth/signin" title="로그인" aria-label="로그인">
+              <LogIn size={20} />
+            </Link>
+          )}
         </li>
       </ul>
     </nav>

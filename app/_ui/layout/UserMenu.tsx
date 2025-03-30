@@ -11,12 +11,15 @@ import { ErrorToast } from "@/lib/toasts";
 import Image from "next/image";
 import Link from "next/link";
 import Spinner from "../shared/Spinner";
+import { useRouter } from "next/navigation";
 
 export default function UserMenu() {
+  const router = useRouter();
   const { mutate: signOut, isPending } = useSignout();
 
   const handleSignOut = () => {
     signOut(undefined, {
+      onSuccess: () => router.refresh(),
       onError: (error) => {
         ErrorToast("로그아웃 실패", error.message);
       },

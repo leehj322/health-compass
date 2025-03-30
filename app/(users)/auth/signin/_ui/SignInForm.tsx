@@ -50,8 +50,8 @@ export default function SignInForm() {
       { email: data.email, password: data.password },
       {
         onSuccess: () => {
-          alert("로그인 성공");
           router.push("/");
+          router.refresh();
         },
         onError: (error) => {
           setFormError(error.message);

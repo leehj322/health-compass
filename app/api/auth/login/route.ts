@@ -7,12 +7,13 @@ export async function POST(req: Request) {
   const { email, password } = await req.json();
 
   try {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (!error) return NextResponse.json({ success: true });
+    if (!error)
+      return NextResponse.json({ success: true, user: data, profile: null });
 
     // UNKNOWN_ERROR: 기본 에러 코드 및 메시지 (아래 조건에 해당하지 않는 경우)
     let code = "UNKNOWN_ERROR";

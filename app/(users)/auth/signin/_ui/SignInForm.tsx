@@ -52,8 +52,8 @@ export default function SignInForm() {
     signIn(
       { email: data.email, password: data.password },
       {
-        onSuccess: (user) => {
-          queryClient.setQueryData(QUERY_KEYS.user.all, user);
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user.all });
           router.push("/");
         },
         onError: (error) => {

@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import Spinner from "@/app/_ui/shared/Spinner";
 import { PASSWORD_REGEX } from "@/constants/regex";
 import { useSignin } from "@/lib/queries/useAuthQueries";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 
 const signInFormSchema = z.object({
   email: z
@@ -33,6 +35,7 @@ const signInFormSchema = z.object({
 export default function SignInForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
@@ -49,8 +52,8 @@ export default function SignInForm() {
     signIn(
       { email: data.email, password: data.password },
       {
-        onSuccess: () => {
-          alert("로그인 성공");
+        onSuccess: (user) => {
+          queryClient.setQueryData(QUERY_KEYS.user.all, user);
           router.push("/");
         },
         onError: (error) => {

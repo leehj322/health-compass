@@ -12,7 +12,11 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll();
         },
-        // The `setAll` method is in middleware for refreshing user sessions
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
+        },
       },
     },
   );

@@ -1,4 +1,7 @@
 export const QUERY_KEYS = {
+  user: {
+    all: ["user"],
+  },
   places: {
     byLocation: (
       lat: number,

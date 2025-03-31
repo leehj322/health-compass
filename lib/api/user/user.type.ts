@@ -6,7 +6,7 @@ interface AppMetadata {
 interface UserIdentity {
   id: string;
   user_id: string;
-  identity_data: Record<string, any>;
+  identity_data: Record<string, string>;
   provider: string;
   last_sign_in_at: string;
   created_at: string;
@@ -25,7 +25,7 @@ export interface SupabaseUser {
   confirmed_at: string | null;
   last_sign_in_at: string | null;
   app_metadata: AppMetadata;
-  user_metadata: Record<string, any>;
+  user_metadata: Record<string, string>;
   identities: UserIdentity[];
   created_at: string;
   updated_at: string;

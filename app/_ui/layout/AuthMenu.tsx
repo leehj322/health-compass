@@ -18,19 +18,17 @@ import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 import { UserProfile } from "@/lib/api/user/user.type";
 
 export default function AuthMenu() {
-  const {
-    data: { user, profile },
-  } = useUser();
+  const { data } = useUser();
 
   return (
     <>
-      {user ? (
+      {data?.user ? (
         <div
           title="유저 메뉴"
           aria-label="유저 메뉴"
           className="flex items-center justify-center pl-1"
         >
-          <ProfileMenu profile={profile} />
+          <ProfileMenu profile={data.profile} />
         </div>
       ) : (
         <Link href="/auth/signin" title="로그인" aria-label="로그인">

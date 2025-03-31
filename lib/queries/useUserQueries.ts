@@ -5,9 +5,10 @@ export const useUser = () => {
   return useQuery({
     queryKey: QUERY_KEYS.user.all,
     queryFn: async () => {
-      const res = await fetch("api/user");
+      const res = await fetch("/api/user");
       const data = await res.json();
-      return data.user;
+      return data;
     },
+    staleTime: 1000 * 60,
   });
 };

@@ -19,8 +19,8 @@ import { UserProfile } from "@/lib/api/user/user.type";
 
 export default function AuthMenu() {
   const {
-data: { user, profile },
-} = useUser();
+    data: { user, profile },
+  } = useUser();
 
   return (
     <>
@@ -52,6 +52,13 @@ function ProfileMenu({ profile }: ProfileMenuProps) {
   const handleSignOut = () => {
     signOut(undefined, {
       onSuccess: () => {
+        // 즉시 UI 반영을 위해 user 데이터를 null로 캐싱
+        queryClient.setQueryData(QUERY_KEYS.user.all, {
+          user: null,
+          profile: null,
+        });
+
+        // 최신 상태 유지를 위해 user 쿼리 무효화하여 서버에서 다시 fetch
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user.all });
       },
       onError: (error) => {

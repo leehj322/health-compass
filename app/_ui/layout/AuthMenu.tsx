@@ -15,9 +15,12 @@ import { LogIn } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@/lib/queries/useUserQueries";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
+import { UserProfile } from "@/lib/api/user/user.type";
 
 export default function AuthMenu() {
-  const { data: user } = useUser();
+  const {
+data: { user, profile },
+} = useUser();
 
   return (
     <>
@@ -27,7 +30,7 @@ export default function AuthMenu() {
           aria-label="유저 메뉴"
           className="flex items-center justify-center pl-1"
         >
-          <ProfileMenu />
+          <ProfileMenu profile={profile} />
         </div>
       ) : (
         <Link href="/auth/signin" title="로그인" aria-label="로그인">
@@ -38,7 +41,11 @@ export default function AuthMenu() {
   );
 }
 
-function ProfileMenu() {
+interface ProfileMenuProps {
+  profile: UserProfile | null;
+}
+
+function ProfileMenu({ profile }: ProfileMenuProps) {
   const queryClient = useQueryClient();
   const { mutate: signOut, isPending } = useSignout();
 
@@ -61,7 +68,7 @@ function ProfileMenu() {
         className="relative cursor-pointer"
       >
         <Image
-          src="/default-profile.png"
+          src={profile?.avatar_url || "/default-profile.png"}
           alt="프로필 이미지"
           width={32}
           height={32}

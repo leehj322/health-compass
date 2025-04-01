@@ -13,10 +13,12 @@ import { ErrorToast } from "@/lib/toasts";
 
 interface CommentActionDropdownProps {
   commentId: string;
+  onEditButtonClick: () => void;
 }
 
 export default function CommentActionDropdown({
   commentId,
+  onEditButtonClick,
 }: CommentActionDropdownProps) {
   const queryClient = useQueryClient();
   const { mutate } = useDeleteDetailComment();
@@ -46,7 +48,7 @@ export default function CommentActionDropdown({
       <DropdownMenuContent className="min-w-20" side="bottom" align="end">
         <DropdownMenuItem
           className="flex items-center justify-center hover:cursor-pointer"
-          onClick={() => console.log("수정")}
+          onClick={onEditButtonClick}
         >
           수정
         </DropdownMenuItem>

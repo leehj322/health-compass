@@ -59,9 +59,12 @@ export default function CommentCard({
 }
 
 function ReplyComment({ reply }: { reply: ReplyDetailComment }) {
+  const { data } = useUser();
+  const isMyComment = data.user ? data.user.id === reply.user_id : false;
+
   return (
     <div className="border-l border-gray-300 bg-gray-50 py-2 pl-2">
-      <div className="flex items-center space-x-2">
+      <div className="relative flex items-center space-x-2">
         <Image
           width={28}
           height={28}
@@ -78,6 +81,13 @@ function ReplyComment({ reply }: { reply: ReplyDetailComment }) {
           </p>
           <p className="text-sm">{reply.content}</p>
         </div>
+
+        {/* 수정, 삭제 드롭다운 */}
+        {isMyComment && (
+          <div className="absolute top-2 right-2">
+            <CommentActionDropdown />
+          </div>
+        )}
       </div>
     </div>
   );

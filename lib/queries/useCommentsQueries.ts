@@ -1,6 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
-import { DetailCommentInput } from "../api/comments/comments.type";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import {
+  DetailCommentInput,
+  DetailCommentResponse,
+} from "../api/comments/comments.type";
 import { createClient } from "../supabase/client";
+import { QUERY_KEYS } from "./queryKeys";
 
 export const useCreateDetailComment = () => {
   return useMutation({
@@ -58,4 +62,33 @@ export const useCreateDetailComment = () => {
       throw new Error("에상치 못한 오류가 발생하였습니다.");
     },
   });
-}
+};
+
+export const useDetailComments = (id: string) => {
+  return useInfiniteQuery<DetailCommentResponse>({
+    queryKey: QUERY_KEYS.comments.byPlaceId(id),
+    queryFn: async ({ pageParam }) => {
+      const res = await fetch(
+        `/api/place/comments?external_institution_id=${id}&page=${pageParam}`,
+      );
+      const data: DetailCommentResponse = await res.json();
+
+      if (!res.ok) throw new Error("댓글 로딩 실패");
+      if (!data.success) throw new Error(data.message);
+
+      return data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage.success || !lastPage.totalCount) return undefined;
+
+      const totalLoaded = allPages
+        .filter((page) => page.success) // 필요없지만 타입 추론을 위해 추가
+        .reduce((sum, page) => sum + page.comments.length, 0);
+
+      return totalLoaded < lastPage.totalCount
+        ? allPages.length + 1
+        : undefined;
+    },
+  });
+};

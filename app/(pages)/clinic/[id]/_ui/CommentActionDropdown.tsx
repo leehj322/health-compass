@@ -21,10 +21,10 @@ export default function CommentActionDropdown({
   onEditButtonClick,
 }: CommentActionDropdownProps) {
   const queryClient = useQueryClient();
-  const { mutate } = useDeleteDetailComment();
+  const { mutate: deleteComment } = useDeleteDetailComment();
 
   const handleCommentDelete = () => {
-    mutate(commentId, {
+    deleteComment(commentId, {
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.comments.byPlaceId(commentId),

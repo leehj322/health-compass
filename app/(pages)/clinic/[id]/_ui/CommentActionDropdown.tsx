@@ -6,8 +6,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
+import { useDeleteDetailComment } from "@/lib/queries/useCommentsQueries";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
+import { ErrorToast } from "@/lib/toasts";
 
-export default function CommentActionDropdown() {
+interface CommentActionDropdownProps {
+  commentId: string;
+}
+
+export default function CommentActionDropdown({
+  commentId,
+}: CommentActionDropdownProps) {
+  const queryClient = useQueryClient();
+  const { mutate } = useDeleteDetailComment();
+
+  const handleCommentDelete = () => {
+    mutate(commentId, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.comments.byPlaceId(commentId),
+        });
+      },
+      onError: (error) => ErrorToast("댓글 삭제 실패", error.message),
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,7 +52,7 @@ export default function CommentActionDropdown() {
         </DropdownMenuItem>
         <DropdownMenuItem
           className="flex items-center justify-center hover:cursor-pointer"
-          onClick={() => console.log("삭제")}
+          onClick={handleCommentDelete}
         >
           삭제
         </DropdownMenuItem>

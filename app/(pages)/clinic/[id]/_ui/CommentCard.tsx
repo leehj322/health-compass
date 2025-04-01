@@ -42,7 +42,7 @@ export default function CommentCard({
         {/* 수정, 삭제 드롭다운 */}
         {isMyComment && (
           <div className="absolute top-3 right-3">
-            <CommentActionDropdown />
+            <CommentActionDropdown commentId={comment.id} />
           </div>
         )}
 
@@ -85,7 +85,7 @@ function ReplyComment({ reply }: { reply: ReplyDetailComment }) {
         {/* 수정, 삭제 드롭다운 */}
         {isMyComment && (
           <div className="absolute top-2 right-2">
-            <CommentActionDropdown />
+            <CommentActionDropdown commentId={reply.id} />
           </div>
         )}
       </div>

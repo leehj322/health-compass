@@ -10,6 +10,7 @@ import { useDeleteDetailComment } from "@/lib/queries/useCommentsQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 import { ErrorToast } from "@/lib/toasts";
+import { usePathname } from "next/navigation";
 
 interface CommentActionDropdownProps {
   commentId: string;
@@ -22,12 +23,14 @@ export default function CommentActionDropdown({
 }: CommentActionDropdownProps) {
   const queryClient = useQueryClient();
   const { mutate: deleteComment } = useDeleteDetailComment();
+  const pathname = usePathname();
+  const placeId = pathname.split("/")?.[2];
 
   const handleCommentDelete = () => {
     deleteComment(commentId, {
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: QUERY_KEYS.comments.byPlaceId(commentId),
+          queryKey: QUERY_KEYS.comments.byPlaceId(placeId),
         });
       },
       onError: (error) => ErrorToast("댓글 삭제 실패", error.message),

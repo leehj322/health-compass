@@ -6,8 +6,37 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
+import { useDeleteDetailComment } from "@/lib/queries/useCommentsQueries";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
+import { ErrorToast } from "@/lib/toasts";
+import { usePathname } from "next/navigation";
 
-export default function CommentActionDropdown() {
+interface CommentActionDropdownProps {
+  commentId: string;
+  onEditButtonClick: () => void;
+}
+
+export default function CommentActionDropdown({
+  commentId,
+  onEditButtonClick,
+}: CommentActionDropdownProps) {
+  const queryClient = useQueryClient();
+  const { mutate: deleteComment } = useDeleteDetailComment();
+  const pathname = usePathname();
+  const placeId = pathname.split("/")?.[2];
+
+  const handleCommentDelete = () => {
+    deleteComment(commentId, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.comments.byPlaceId(placeId),
+        });
+      },
+      onError: (error) => ErrorToast("댓글 삭제 실패", error.message),
+    });
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -22,13 +51,13 @@ export default function CommentActionDropdown() {
       <DropdownMenuContent className="min-w-20" side="bottom" align="end">
         <DropdownMenuItem
           className="flex items-center justify-center hover:cursor-pointer"
-          onClick={() => console.log("수정")}
+          onClick={onEditButtonClick}
         >
           수정
         </DropdownMenuItem>
         <DropdownMenuItem
           className="flex items-center justify-center hover:cursor-pointer"
-          onClick={() => console.log("삭제")}
+          onClick={handleCommentDelete}
         >
           삭제
         </DropdownMenuItem>

@@ -26,16 +26,16 @@ export default function CommentReplyFormToggle({
       >
         {isOpen ? "답글 닫기" : "답글 달기"}
       </Button>
-      {isOpen && <CommentReplyForm commentId={commentId} />}
+      {isOpen && <CommentReplyForm parentId={commentId} />}
     </div>
   );
 }
 
 interface CommentReplyFormProps {
-  commentId: string;
+  parentId: string;
 }
 
-function CommentReplyForm({ commentId }: CommentReplyFormProps) {
+function CommentReplyForm({ parentId }: CommentReplyFormProps) {
   const [content, setContent] = useState("");
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -48,7 +48,7 @@ function CommentReplyForm({ commentId }: CommentReplyFormProps) {
     if (!content.trim()) return;
 
     createComment(
-      { content, external_institution_id: placeId, parent_id: commentId },
+      { content, external_institution_id: placeId, parent_id: parentId },
       {
         onSuccess: () => {
           setContent("");

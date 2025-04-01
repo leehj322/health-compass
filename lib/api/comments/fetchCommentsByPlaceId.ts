@@ -1,24 +1,13 @@
 import { createClient } from "@/lib/supabase/server";
 import { buildCommentTree } from "@/utils/buildCommentTree";
-import { TopLevelDetailComment } from "./comments.type";
+import { DetailCommentResponse, TopLevelDetailComment } from "./comments.type";
 
 const PAGE_SIZE = 5;
 
 export async function fetchCommentsByPlaceId(
   placeId: string,
   page = 1,
-): Promise<
-  | {
-      success: false;
-      code: string;
-      message: string;
-    }
-  | {
-      success: true;
-      comments: TopLevelDetailComment[];
-      page: number;
-    }
-> {
+): Promise<DetailCommentResponse> {
   const supabase = await createClient();
 
   const from = (page - 1) * PAGE_SIZE;

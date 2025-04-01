@@ -36,8 +36,19 @@ export interface ReplyDetailComment extends DetailCommentWithProfile {
   children?: never; // 없음
 }
 
-export interface CommentListResponse {
-  success: boolean;
+// Response
+export interface DetailCommentSuccessResponse {
+  success: true;
   comments: TopLevelDetailComment[];
   page: number;
 }
+
+export interface DetailCommentErrorResponse {
+  success: false;
+  code: string;
+  message: string;
+}
+
+export type DetailCommentResponse =
+  | DetailCommentSuccessResponse
+  | DetailCommentErrorResponse;

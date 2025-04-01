@@ -2,6 +2,9 @@ export const QUERY_KEYS = {
   user: {
     all: ["user"],
   },
+  comments: {
+    byPlaceId: (id: string) => ["comments", id],
+  },
   places: {
     byLocation: (
       lat: number,

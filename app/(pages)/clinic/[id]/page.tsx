@@ -5,10 +5,14 @@ import PlaceSocialActions from "./_ui/PlaceSocialActions";
 import CommentForm from "./_ui/CommentForm";
 import CommentList from "./_ui/CommentList";
 import { redirect } from "next/navigation";
-import { PlaceDocument } from "@/lib/api/kakaoLocal.type";
-import { PublicDataItem } from "@/lib/api/publicData.type";
-import { TopLevelDetailComment } from "@/lib/api/comments/comments.type";
 import { fetchPlaceDetail } from "@/lib/api/places/fetchPlaceDetail";
+import { fetchCommentsByPlaceId } from "@/lib/api/comments/fetchCommentsByPlaceId";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 
 type PlaceDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -28,26 +32,27 @@ export default async function PlaceDetailPage({
   const { id } = await params;
   const { x, y, name, addr } = await searchParams;
 
+  // URL에 쿼리가 정상적으로 담겨있는지 확인
   if (!x || !y || !name || !addr) redirect(`/clinic/${id}/invalid`);
 
-  let placeData: PlaceDocument & { details: PublicDataItem | null };
-  let commentsData: TopLevelDetailComment[] = [];
-  let commentsErrorMessage: string | null = null;
+  const queryClient = new QueryClient();
 
-  // 장소 정보를 카카오 및 공공데이터 API에서 받아옴
-  // 실패 시 잘못된 요청으로 간주하고 invalid 페이지로 redirect 처리
-  try {
-    placeData = await fetchPlaceDetail({
-      id,
-      name,
-      addr,
-      x: Number(x),
-      y: Number(y),
-    });
-  } catch (error) {
-    console.error("상세 페이지 장소 정보 요청 실패:", error);
+  const [placeDetailRes /* , _ */] = await Promise.allSettled([
+    fetchPlaceDetail({ id, name, addr, x: Number(x), y: Number(y) }),
+    queryClient.prefetchQuery({
+      queryKey: QUERY_KEYS.comments.byPlaceId(id),
+      queryFn: async () => await fetchCommentsByPlaceId(id),
+    }),
+  ]);
+
+  const dehydratedState = dehydrate(queryClient);
+
+  // 장소 정보 처리 (실패 시 invalid 페이지로 redirect)
+  if (placeDetailRes.status !== "fulfilled") {
+    console.error("장소 정보 요청 실패:", placeDetailRes.reason);
     redirect(`/clinic/${id}/invalid`);
   }
+  const placeData = placeDetailRes.value;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
@@ -68,10 +73,9 @@ export default async function PlaceDetailPage({
 
       {/* 하단 레이아웃: 댓글 작성 및 댓글 리스트 */}
       <CommentForm />
-      <CommentList
-        comments={commentsData}
-        errorMessage={commentsErrorMessage}
-      />
+      <HydrationBoundary state={dehydratedState}>
+        <CommentList />
+      </HydrationBoundary>
     </div>
   );
 }

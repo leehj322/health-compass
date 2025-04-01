@@ -94,3 +94,25 @@ export const useCreateDetailComment = () => {
     },
   });
 };
+
+// 상세 페이지 댓글 및 답글 삭제
+export const useDeleteDetailComment = () => {
+  return useMutation({
+    mutationFn: async (commentId: string) => {
+      const res = await fetch(`/api/place/comments?commentId=${commentId}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "댓글 삭제 실패");
+      }
+
+      return data;
+    },
+    onError: (error) => {
+      console.error("댓글 삭제 에러:", error);
+    },
+  });
+};

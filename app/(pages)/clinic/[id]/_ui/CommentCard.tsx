@@ -5,6 +5,7 @@ import {
   ReplyDetailComment,
   TopLevelDetailComment,
 } from "@/lib/api/comments/comments.type";
+import { getTimeAgo } from "@/utils/formatDate";
 
 export default function CommentCard({
   comment,
@@ -26,7 +27,7 @@ export default function CommentCard({
             <p className="text-sm font-medium">
               {comment.profiles.nickname}
               <span className="ml-1 text-xs text-gray-500">
-                · 2시간 전 {comment.created_at}
+                · {getTimeAgo(comment.created_at)}
               </span>
             </p>
             <p className="text-sm">{comment.content}</p>
@@ -58,7 +59,7 @@ function ReplyComment({ reply }: { reply: ReplyDetailComment }) {
           <p className="text-sm font-medium">
             {reply.profiles.nickname}
             <span className="ml-1 text-xs text-gray-500">
-              · 5분 전 {reply.created_at}
+              · {getTimeAgo(reply.created_at)}
             </span>
           </p>
           <p className="text-sm">{reply.content}</p>

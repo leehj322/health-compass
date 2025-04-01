@@ -12,6 +12,7 @@ import {
 } from "@/lib/api/publicData";
 import { PlaceDocument } from "@/lib/api/kakaoLocal.type";
 import { PublicDataItem } from "@/lib/api/publicData.type";
+import { TopLevelDetailComment } from "@/lib/api/comments/comments.type";
 
 type PlaceDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -33,7 +34,9 @@ export default async function PlaceDetailPage({
 
   if (!x || !y || !name || !addr) redirect(`/clinic/${id}/invalid`);
 
-  let data: PlaceDocument & { details: PublicDataItem | null };
+  let placeData: PlaceDocument & { details: PublicDataItem | null };
+  let commentsData: TopLevelDetailComment[] = [];
+  let commentsErrorMessage: string | null = null;
 
   try {
     const [kakaoRes, hospitalRes, pharmacyRes] = await Promise.allSettled([
@@ -53,7 +56,7 @@ export default async function PlaceDetailPage({
 
     // kakao response의 정보와 비교했을 때, 일치하지 않는 경우 url 조작 판단
     if (id !== place.id) {
-      redirect(`/clinic/${id}/invalid`);
+      throw new Error("잘못된 URL 확인");
     }
 
     // 공공데이터 응답 처리
@@ -65,7 +68,7 @@ export default async function PlaceDetailPage({
       details = hospitalRes.value;
     }
 
-    data = { ...place, details };
+    placeData = { ...place, details };
   } catch (error) {
     console.error("상세 페이지 데이터 요청 실패:", error);
     redirect(`/clinic/${id}/invalid`);
@@ -75,12 +78,12 @@ export default async function PlaceDetailPage({
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       {/* 상단 레이아웃: 지도 + 장소 정보 */}
       <div className="grid gap-4 md:grid-cols-2">
-        <KakaoMap placeData={data} />
+        <KakaoMap placeData={placeData} />
 
         <div className="flex flex-col justify-between rounded-xl bg-gray-50 p-4 shadow md:min-h-72">
           <div className="space-y-1">
-            <PlaceBasicInfo placeData={data} />
-            <PlaceHoursToggle placeData={data} />
+            <PlaceBasicInfo placeData={placeData} />
+            <PlaceHoursToggle placeData={placeData} />
           </div>
           <div className="flex items-center justify-end space-x-4">
             <PlaceSocialActions />
@@ -90,7 +93,10 @@ export default async function PlaceDetailPage({
 
       {/* 하단 레이아웃: 댓글 작성 및 댓글 리스트 */}
       <CommentForm />
-      <CommentList />
+      <CommentList
+        comments={commentsData}
+        errorMessage={commentsErrorMessage}
+      />
     </div>
   );
 }

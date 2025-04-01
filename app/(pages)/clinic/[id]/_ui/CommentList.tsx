@@ -1,35 +1,28 @@
+import { TopLevelDetailComment } from "@/lib/api/comments/comments.type";
 import CommentCard from "./CommentCard";
 
-export default function CommentList() {
-  const comments = [
-    {
-      id: 1,
-      user: "사용자A",
-      content: "이 장소 정말 좋아요!",
-      profileImageUrl: null,
-      replies: [
-        {
-          id: 11,
-          profileImageUrl: null,
-          user: "운영자",
-          content: "감사합니다!",
-        },
-      ],
-    },
-    {
-      id: 2,
-      user: "사용자B",
-      content: "영업시간 정보 유용했어요.",
-      profileImageUrl: null,
-      replies: [],
-    },
-  ];
+interface CommentListProps {
+  comments: TopLevelDetailComment[];
+  errorMessage: null | string;
+}
 
+export default async function CommentList({
+  comments,
+  errorMessage,
+}: CommentListProps) {
   return (
-    <div className="space-y-4">
-      {comments.map((comment) => (
-        <CommentCard key={comment.id} comment={comment} />
-      ))}
-    </div>
+    <>
+      {comments.length === 0 ? (
+        <div className="w-full py-10 text-center text-sm text-gray-500">
+          {errorMessage ?? "아직 댓글이 없습니다. 첫 댓글을 남겨보세요!"}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {comments.map((comment) => (
+            <CommentCard key={comment.id} comment={comment} />
+          ))}
+        </div>
+      )}
+    </>
   );
 }

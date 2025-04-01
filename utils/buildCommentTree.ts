@@ -46,7 +46,7 @@ export function buildCommentTree(flat: any) {
     if (!isTopLevel(comment)) {
       const parent = commentMap.get(comment.parent_id);
       if (parent && isTopLevel(parent)) {
-        parent.children.push(comment);
+        parent.children.unshift(comment);
       }
     } else {
       rootComments.push(comment);

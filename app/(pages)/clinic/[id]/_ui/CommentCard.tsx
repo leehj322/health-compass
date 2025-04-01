@@ -6,8 +6,6 @@ import {
   TopLevelDetailComment,
 } from "@/lib/api/comments/comments.type";
 
-// 아직 comment에 대한 정확한 API 설계가 진행되지 않았으므로 (ex. date 추가 등) 아래에서 임시로 any 사용
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function CommentCard({
   comment,
 }: {

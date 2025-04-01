@@ -1,15 +1,12 @@
+"use client";
+
 import { TopLevelDetailComment } from "@/lib/api/comments/comments.type";
 import CommentCard from "./CommentCard";
 
-interface CommentListProps {
-  comments: TopLevelDetailComment[];
-  errorMessage: null | string;
-}
+export default function CommentList() {
+  const comments: TopLevelDetailComment[] = [];
+  const errorMessage: null | string = null;
 
-export default async function CommentList({
-  comments,
-  errorMessage,
-}: CommentListProps) {
   return (
     <>
       {comments.length === 0 ? (

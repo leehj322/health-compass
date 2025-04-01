@@ -1,11 +1,20 @@
+import Spinner from "@/app/_ui/shared/Spinner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 import { useCreateDetailComment } from "@/lib/queries/useCommentsQueries";
 import { ErrorToast } from "@/lib/toasts";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-export default function CommentReplyFormToggle() {
+interface CommentReplyFormToggleProps {
+  commentId: string;
+}
+
+export default function CommentReplyFormToggle({
+  commentId,
+}: CommentReplyFormToggleProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -17,30 +26,37 @@ export default function CommentReplyFormToggle() {
       >
         {isOpen ? "답글 닫기" : "답글 달기"}
       </Button>
-      {isOpen && <CommentReplyForm />}
+      {isOpen && <CommentReplyForm commentId={commentId} />}
     </div>
   );
 }
 
-function CommentReplyForm() {
+interface CommentReplyFormProps {
+  commentId: string;
+}
+
+function CommentReplyForm({ commentId }: CommentReplyFormProps) {
   const [content, setContent] = useState("");
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
   const { mutate: createComment, isPending } = useCreateDetailComment();
 
-  const clinicId = pathname.split("/")?.[2];
-
-  // 임시 아이디
-  const parent_id = "8ba1f8c8-3033-4e9b-9d6f-b6ea07c0196d";
+  const placeId = pathname.split("/")?.[2];
 
   const handleCreateButtonClick = () => {
     if (!content.trim()) return;
 
     createComment(
-      { content, external_institution_id: clinicId, parent_id },
+      { content, external_institution_id: placeId, parent_id: commentId },
       {
-        onSuccess: () => setContent(""),
-        onError: (error) => ErrorToast(error.message),
+        onSuccess: () => {
+          setContent("");
+          queryClient.invalidateQueries({
+            queryKey: QUERY_KEYS.comments.byPlaceId(placeId),
+          });
+        },
+        onError: (error) => ErrorToast("답글 작성 실패", error.message),
       },
     );
   };
@@ -59,7 +75,7 @@ function CommentReplyForm() {
         disabled={isPending || !content.trim()}
         className="ml-auto flex w-24 cursor-pointer bg-emerald-600 text-white hover:bg-emerald-700"
       >
-        답글 등록
+        {isPending ? <Spinner /> : "답글 등록"}
       </Button>
     </div>
   );

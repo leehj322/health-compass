@@ -7,23 +7,32 @@ import { useCreateDetailComment } from "@/lib/queries/useCommentsQueries";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ErrorToast } from "@/lib/toasts";
+import { useQueryClient } from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
+import Spinner from "@/app/_ui/shared/Spinner";
 
 export default function CommentForm() {
   const [content, setContent] = useState("");
   const pathname = usePathname();
+  const queryClient = useQueryClient();
 
   const { mutate: createComment, isPending } = useCreateDetailComment();
 
-  const clinicId = pathname.split("/")?.[2];
+  const placeId = pathname.split("/")?.[2];
 
   const handleCreateButtonClick = () => {
     if (!content.trim()) return;
 
     createComment(
-      { content, external_institution_id: clinicId },
+      { content, external_institution_id: placeId },
       {
-        onSuccess: () => setContent(""),
-        onError: (error) => ErrorToast(error.message),
+        onSuccess: () => {
+          setContent("");
+          queryClient.invalidateQueries({
+            queryKey: QUERY_KEYS.comments.byPlaceId(placeId),
+          });
+        },
+        onError: (error) => ErrorToast("댓글 작성 실패", error.message),
       },
     );
   };
@@ -44,7 +53,7 @@ export default function CommentForm() {
           disabled={isPending || !content.trim()}
           className="ml-auto flex w-24 cursor-pointer bg-emerald-600 text-white hover:bg-emerald-700"
         >
-          등록
+          {isPending ? <Spinner /> : "등록"}
         </Button>
       </CardContent>
     </Card>

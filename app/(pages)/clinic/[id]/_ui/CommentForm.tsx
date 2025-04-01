@@ -32,7 +32,7 @@ export default function CommentForm() {
             queryKey: QUERY_KEYS.comments.byPlaceId(placeId),
           });
         },
-        onError: (error) => ErrorToast(error.message),
+        onError: (error) => ErrorToast("댓글 작성 실패", error.message),
       },
     );
   };

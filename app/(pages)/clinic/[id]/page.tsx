@@ -5,14 +5,10 @@ import PlaceSocialActions from "./_ui/PlaceSocialActions";
 import CommentForm from "./_ui/CommentForm";
 import CommentList from "./_ui/CommentList";
 import { redirect } from "next/navigation";
-import { getPlaceByName } from "@/lib/api/kakaoLocal";
-import {
-  getHospitalDetailsByName,
-  getPharmacyDetailsByName,
-} from "@/lib/api/publicData";
 import { PlaceDocument } from "@/lib/api/kakaoLocal.type";
 import { PublicDataItem } from "@/lib/api/publicData.type";
 import { TopLevelDetailComment } from "@/lib/api/comments/comments.type";
+import { fetchPlaceDetail } from "@/lib/api/places/fetchPlaceDetail";
 
 type PlaceDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -38,39 +34,18 @@ export default async function PlaceDetailPage({
   let commentsData: TopLevelDetailComment[] = [];
   let commentsErrorMessage: string | null = null;
 
+  // 장소 정보를 카카오 및 공공데이터 API에서 받아옴
+  // 실패 시 잘못된 요청으로 간주하고 invalid 페이지로 redirect 처리
   try {
-    const [kakaoRes, hospitalRes, pharmacyRes] = await Promise.allSettled([
-      getPlaceByName(name, Number(x), Number(y)),
-      getHospitalDetailsByName(name, addr, "server"),
-      getPharmacyDetailsByName(name, addr, "server"),
-    ]);
-
-    // 카카오 응답 처리
-    if (kakaoRes.status !== "fulfilled") {
-      throw new Error("카카오 API 요청 실패");
-    }
-    if (!kakaoRes.value?.documents?.[0]) {
-      throw new Error("카카오 장소 정보 없음");
-    }
-    const place = kakaoRes.value.documents[0];
-
-    // kakao response의 정보와 비교했을 때, 일치하지 않는 경우 url 조작 판단
-    if (id !== place.id) {
-      throw new Error("잘못된 URL 확인");
-    }
-
-    // 공공데이터 응답 처리
-    let details: PublicDataItem | null = null;
-    if (pharmacyRes.status === "fulfilled" && pharmacyRes.value) {
-      details = pharmacyRes.value;
-    }
-    if (hospitalRes.status === "fulfilled" && hospitalRes.value) {
-      details = hospitalRes.value;
-    }
-
-    placeData = { ...place, details };
+    placeData = await fetchPlaceDetail({
+      id,
+      name,
+      addr,
+      x: Number(x),
+      y: Number(y),
+    });
   } catch (error) {
-    console.error("상세 페이지 데이터 요청 실패:", error);
+    console.error("상세 페이지 장소 정보 요청 실패:", error);
     redirect(`/clinic/${id}/invalid`);
   }
 

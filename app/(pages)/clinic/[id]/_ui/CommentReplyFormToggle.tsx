@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useCreateComment } from "@/lib/queries/useCommentsQueries";
+import { useCreateDetailComment } from "@/lib/queries/useCommentsQueries";
 import { ErrorToast } from "@/lib/toasts";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -26,7 +26,7 @@ function CommentReplyForm() {
   const [content, setContent] = useState("");
   const pathname = usePathname();
 
-  const { mutate: createComment, isPending } = useCreateComment();
+  const { mutate: createComment, isPending } = useCreateDetailComment();
 
   const clinicId = pathname.split("/")?.[2];
 

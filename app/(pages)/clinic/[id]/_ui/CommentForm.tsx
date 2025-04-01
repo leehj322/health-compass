@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useCreateComment } from "@/lib/queries/useCommentsQueries";
+import { useCreateDetailComment } from "@/lib/queries/useCommentsQueries";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ErrorToast } from "@/lib/toasts";
@@ -12,7 +12,7 @@ export default function CommentForm() {
   const [content, setContent] = useState("");
   const pathname = usePathname();
 
-  const { mutate: createComment, isPending } = useCreateComment();
+  const { mutate: createComment, isPending } = useCreateDetailComment();
 
   const clinicId = pathname.split("/")?.[2];
 

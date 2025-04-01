@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { DetailCommentInput } from "../api/comments/comments.type";
 import { createClient } from "../supabase/client";
 
-export function useCreateComment() {
+export const useCreateDetailComment = () => {
   return useMutation({
     mutationFn: async (newComment: DetailCommentInput) => {
       const supabase = createClient();

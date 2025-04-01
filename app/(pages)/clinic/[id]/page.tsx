@@ -5,13 +5,14 @@ import PlaceSocialActions from "./_ui/PlaceSocialActions";
 import CommentForm from "./_ui/CommentForm";
 import CommentList from "./_ui/CommentList";
 import { redirect } from "next/navigation";
-import { getPlaceByName } from "@/lib/api/kakaoLocal";
+import { fetchPlaceDetail } from "@/lib/api/places/fetchPlaceDetail";
+import { fetchCommentsByPlaceId } from "@/lib/api/comments/fetchCommentsByPlaceId";
 import {
-  getHospitalDetailsByName,
-  getPharmacyDetailsByName,
-} from "@/lib/api/publicData";
-import { PlaceDocument } from "@/lib/api/kakaoLocal.type";
-import { PublicDataItem } from "@/lib/api/publicData.type";
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 
 type PlaceDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -31,56 +32,39 @@ export default async function PlaceDetailPage({
   const { id } = await params;
   const { x, y, name, addr } = await searchParams;
 
+  // URL에 쿼리가 정상적으로 담겨있는지 확인
   if (!x || !y || !name || !addr) redirect(`/clinic/${id}/invalid`);
 
-  let data: PlaceDocument & { details: PublicDataItem | null };
+  const queryClient = new QueryClient();
 
-  try {
-    const [kakaoRes, hospitalRes, pharmacyRes] = await Promise.allSettled([
-      getPlaceByName(name, Number(x), Number(y)),
-      getHospitalDetailsByName(name, addr, "server"),
-      getPharmacyDetailsByName(name, addr, "server"),
-    ]);
+  const [placeDetailRes /* , _ */] = await Promise.allSettled([
+    fetchPlaceDetail({ id, name, addr, x: Number(x), y: Number(y) }),
+    queryClient.prefetchInfiniteQuery({
+      queryKey: QUERY_KEYS.comments.byPlaceId(id),
+      queryFn: async () => await fetchCommentsByPlaceId(id),
+      initialPageParam: 1,
+    }),
+  ]);
 
-    // 카카오 응답 처리
-    if (kakaoRes.status !== "fulfilled") {
-      throw new Error("카카오 API 요청 실패");
-    }
-    if (!kakaoRes.value?.documents?.[0]) {
-      throw new Error("카카오 장소 정보 없음");
-    }
-    const place = kakaoRes.value.documents[0];
+  const dehydratedState = dehydrate(queryClient);
 
-    // kakao response의 정보와 비교했을 때, 일치하지 않는 경우 url 조작 판단
-    if (id !== place.id) {
-      redirect(`/clinic/${id}/invalid`);
-    }
-
-    // 공공데이터 응답 처리
-    let details: PublicDataItem | null = null;
-    if (pharmacyRes.status === "fulfilled" && pharmacyRes.value) {
-      details = pharmacyRes.value;
-    }
-    if (hospitalRes.status === "fulfilled" && hospitalRes.value) {
-      details = hospitalRes.value;
-    }
-
-    data = { ...place, details };
-  } catch (error) {
-    console.error("상세 페이지 데이터 요청 실패:", error);
+  // 장소 정보 처리 (실패 시 invalid 페이지로 redirect)
+  if (placeDetailRes.status !== "fulfilled") {
+    console.error("장소 정보 요청 실패:", placeDetailRes.reason);
     redirect(`/clinic/${id}/invalid`);
   }
+  const placeData = placeDetailRes.value;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       {/* 상단 레이아웃: 지도 + 장소 정보 */}
       <div className="grid gap-4 md:grid-cols-2">
-        <KakaoMap placeData={data} />
+        <KakaoMap placeData={placeData} />
 
         <div className="flex flex-col justify-between rounded-xl bg-gray-50 p-4 shadow md:min-h-72">
           <div className="space-y-1">
-            <PlaceBasicInfo placeData={data} />
-            <PlaceHoursToggle placeData={data} />
+            <PlaceBasicInfo placeData={placeData} />
+            <PlaceHoursToggle placeData={placeData} />
           </div>
           <div className="flex items-center justify-end space-x-4">
             <PlaceSocialActions />
@@ -90,7 +74,9 @@ export default async function PlaceDetailPage({
 
       {/* 하단 레이아웃: 댓글 작성 및 댓글 리스트 */}
       <CommentForm />
-      <CommentList />
+      <HydrationBoundary state={dehydratedState}>
+        <CommentList placeId={id} />
+      </HydrationBoundary>
     </div>
   );
 }

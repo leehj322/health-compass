@@ -19,8 +19,8 @@ export default function CommentCard({
 
   return (
     <Card className="py-0">
-      <CardContent className="space-y-2 p-4">
-        <div className="relative flex items-center space-x-2">
+      <CardContent className="relative space-y-2 p-4">
+        <div className="flex items-center space-x-2">
           <Image
             width={32}
             height={32}
@@ -37,14 +37,16 @@ export default function CommentCard({
             </p>
             <p className="text-sm">{comment.content}</p>
           </div>
-
-          {/* 수정, 삭제 드롭다운 */}
-          {isMyComment && (
-            <div className="absolute top-1 right-1">
-              <CommentActionDropdown />
-            </div>
-          )}
         </div>
+
+        {/* 수정, 삭제 드롭다운 */}
+        {isMyComment && (
+          <div className="absolute top-3 right-3">
+            <CommentActionDropdown />
+          </div>
+        )}
+
+        {/* 답글 목록 */}
         <div className="mt-2 space-y-2 pl-4">
           {comment.children.map((reply) => (
             <ReplyComment key={reply.id} reply={reply} />

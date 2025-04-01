@@ -136,3 +136,60 @@ export async function DELETE(req: Request) {
   // success: true 보내기 위해서 응답 코드 200으로 처리
   return NextResponse.json({ success: true }, { status: 200 });
 }
+
+export async function PATCH(req: Request) {
+  const supabase = await createClient();
+  const body = await req.json();
+  const { commentId, content } = body;
+
+  if (!commentId || !content?.trim()) {
+    return NextResponse.json(
+      {
+        success: false,
+        code: "INVALID_INPUT",
+        message: "댓글 ID 또는 내용이 누락되었습니다.",
+      },
+      { status: 400 },
+    );
+  }
+
+  // 유저 인증 확인
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json(
+      {
+        success: false,
+        code: "UNAUTHORIZED",
+        message: "로그인이 필요합니다.",
+      },
+      { status: 401 },
+    );
+  }
+
+  // 본인 댓글만 수정 가능
+  const { error } = await supabase
+    .from("comments")
+    .update({
+      content,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", commentId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return NextResponse.json(
+      {
+        success: false,
+        code: "FAILED_UPDATE_COMMENT",
+        message: "댓글 수정에 실패했습니다.",
+      },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({ success: true }, { status: 200 });
+}

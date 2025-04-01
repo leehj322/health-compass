@@ -116,3 +116,36 @@ export const useDeleteDetailComment = () => {
     },
   });
 };
+
+// 상세 페이지 댓글 및 답글 수정
+export const useUpdateDetailComment = () => {
+  return useMutation({
+    mutationFn: async ({
+      commentId,
+      content,
+    }: {
+      commentId: string;
+      content: string;
+    }) => {
+      const res = await fetch("/api/place/comments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          commentId,
+          content,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "댓글 수정 실패");
+      }
+
+      return data;
+    },
+    onError: (error) => {
+      console.error("댓글 수정 에러:", error);
+    },
+  });
+};

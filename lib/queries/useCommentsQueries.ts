@@ -26,13 +26,13 @@ export function useCreateComment() {
         {
           content: newComment.content,
           external_institution_id: newComment.external_institution_id,
-          parent_id: null,
-          user_id: user?.id,
+          parent_id: newComment.parent_id ?? null,
+          user_id: user.id,
         },
       ]);
 
       if (insertError) {
-        console.error("댓글 DB 저장 실패:", insertError);
+        console.error("댓글 저장 실패:", insertError);
         throw new Error("댓글 저장 중 오류가 발생했습니다.");
       }
 

@@ -1,35 +1,62 @@
-import CommentCard from "./CommentCard";
+"use client";
 
-export default function CommentList() {
-  const comments = [
-    {
-      id: 1,
-      user: "사용자A",
-      content: "이 장소 정말 좋아요!",
-      profileImageUrl: null,
-      replies: [
-        {
-          id: 11,
-          profileImageUrl: null,
-          user: "운영자",
-          content: "감사합니다!",
-        },
-      ],
-    },
-    {
-      id: 2,
-      user: "사용자B",
-      content: "영업시간 정보 유용했어요.",
-      profileImageUrl: null,
-      replies: [],
-    },
-  ];
+import { TopLevelDetailComment } from "@/lib/api/comments/comments.type";
+import CommentCard from "./CommentCard";
+import { useDetailComments } from "@/lib/queries/useCommentsQueries";
+import Spinner from "@/app/_ui/shared/Spinner";
+import { Button } from "@/components/ui/button";
+
+interface CommentListProps {
+  placeId: string;
+}
+
+export default function CommentList({ placeId }: CommentListProps) {
+  const { data, isLoading, isError, fetchNextPage, hasNextPage } =
+    useDetailComments(placeId);
+
+  if (isError || !data) {
+    return (
+      <div className="w-full py-10 text-center text-sm text-gray-500">
+        댓글을 불러오는 데 실패했습니다.
+      </div>
+    );
+  }
+
+  const comments: TopLevelDetailComment[] = data?.pages?.flatMap((page) =>
+    page.success ? page.comments : [],
+  );
 
   return (
     <div className="space-y-4">
-      {comments.map((comment) => (
-        <CommentCard key={comment.id} comment={comment} />
-      ))}
+      {comments.length === 0 ? (
+        <div className="w-full py-10 text-center text-sm text-gray-500">
+          아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
+        </div>
+      ) : (
+        <>
+          {comments.map((comment) => (
+            <CommentCard key={comment.id} comment={comment} />
+          ))}
+
+          {isLoading && (
+            <div className="flex items-center justify-center">
+              <Spinner />
+            </div>
+          )}
+
+          {hasNextPage && (
+            <div className="pt-2 text-center">
+              <Button
+                variant="ghost"
+                className="h-auto cursor-pointer p-0 text-sm text-emerald-600 hover:underline"
+                onClick={() => fetchNextPage()}
+              >
+                더 보기
+              </Button>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

@@ -14,9 +14,13 @@ export async function GET(req: Request) {
   const to = from + PAGE_SIZE - 1;
 
   // 1. 상위 댓글만 페이징
-  const { data: topLevelComments, error: topLevelError } = await supabase
+  const {
+    data: topLevelComments,
+    error: topLevelError,
+    count: totalCount,
+  } = await supabase
     .from("comments")
-    .select("id")
+    .select("id", { count: "exact" })
     .eq("external_institution_id", placeId)
     .is("parent_id", null)
     .order("created_at", { ascending: false }) // 최신순
@@ -37,7 +41,7 @@ export async function GET(req: Request) {
 
   if (topLevelIds.length === 0) {
     return NextResponse.json(
-      { success: true, comments: [], page },
+      { success: true, comments: [], totalCount },
       { status: 200 },
     );
   }
@@ -81,7 +85,7 @@ export async function GET(req: Request) {
   const tree = buildCommentTree(allComments);
 
   return NextResponse.json(
-    { success: true, comments: tree, page },
+    { success: true, comments: tree, totalCount },
     { status: 200 },
   );
 }

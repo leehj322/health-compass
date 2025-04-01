@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { buildCommentTree } from "@/utils/buildCommentTree";
-import { DetailCommentResponse, TopLevelDetailComment } from "./comments.type";
+import { DetailCommentResponse } from "./comments.type";
 
 const PAGE_SIZE = 5;
 
@@ -14,9 +14,13 @@ export async function fetchCommentsByPlaceId(
   const to = from + PAGE_SIZE - 1;
 
   // 1. 상위 댓글만 페이징
-  const { data: topLevelComments, error: topLevelError } = await supabase
+  const {
+    data: topLevelComments,
+    error: topLevelError,
+    count: totalCount,
+  } = await supabase
     .from("comments")
-    .select("id")
+    .select("id", { count: "exact" })
     .eq("external_institution_id", placeId)
     .is("parent_id", null)
     .order("created_at", { ascending: false }) // 최신순
@@ -37,7 +41,7 @@ export async function fetchCommentsByPlaceId(
     return {
       success: true,
       comments: [],
-      page,
+      totalCount,
     };
   }
 
@@ -79,6 +83,6 @@ export async function fetchCommentsByPlaceId(
   return {
     success: true,
     comments: tree,
-    page,
+    totalCount,
   };
 }

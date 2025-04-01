@@ -40,7 +40,7 @@ export interface ReplyDetailComment extends DetailCommentWithProfile {
 export interface DetailCommentSuccessResponse {
   success: true;
   comments: TopLevelDetailComment[];
-  page: number;
+  totalCount: number | null;
 }
 
 export interface DetailCommentErrorResponse {

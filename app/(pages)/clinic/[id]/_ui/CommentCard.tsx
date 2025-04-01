@@ -51,7 +51,7 @@ export default function CommentCard({
           {comment.children.map((reply) => (
             <ReplyComment key={reply.id} reply={reply} />
           ))}
-          <CommentReplyFormToggle />
+          <CommentReplyFormToggle commentId={comment.id} />
         </div>
       </CardContent>
     </Card>

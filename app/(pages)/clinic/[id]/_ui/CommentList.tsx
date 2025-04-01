@@ -11,7 +11,7 @@ interface CommentListProps {
 }
 
 export default function CommentList({ placeId }: CommentListProps) {
-  const { data, isLoading, isError, fetchNextPage, hasNextPage } =
+  const { data, isError, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useDetailComments(placeId);
 
   if (isError || !data) {
@@ -38,14 +38,14 @@ export default function CommentList({ placeId }: CommentListProps) {
             <CommentCard key={comment.id} comment={comment} />
           ))}
 
-          {isLoading && (
-            <div className="flex items-center justify-center">
+          {isFetchingNextPage && (
+            <div className="flex h-8 items-center justify-center">
               <Spinner />
             </div>
           )}
 
-          {hasNextPage && (
-            <div className="pt-2 text-center">
+          {hasNextPage && !isFetchingNextPage && (
+            <div className="h-8 pt-2 text-center">
               <Button
                 variant="ghost"
                 className="h-auto cursor-pointer p-0 text-sm text-emerald-600 hover:underline"

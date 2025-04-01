@@ -3,9 +3,14 @@
 import { TopLevelDetailComment } from "@/lib/api/comments/comments.type";
 import CommentCard from "./CommentCard";
 
-export default function CommentList() {
+interface CommentListProps {
+  placeId: string;
+}
+
+export default function CommentList({ placeId }: CommentListProps) {
   const comments: TopLevelDetailComment[] = [];
   const errorMessage: null | string = null;
+  console.log(placeId);
 
   return (
     <>

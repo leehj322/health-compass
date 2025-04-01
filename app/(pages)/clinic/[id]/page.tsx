@@ -39,9 +39,10 @@ export default async function PlaceDetailPage({
 
   const [placeDetailRes /* , _ */] = await Promise.allSettled([
     fetchPlaceDetail({ id, name, addr, x: Number(x), y: Number(y) }),
-    queryClient.prefetchQuery({
+    queryClient.prefetchInfiniteQuery({
       queryKey: QUERY_KEYS.comments.byPlaceId(id),
       queryFn: async () => await fetchCommentsByPlaceId(id),
+      initialPageParam: 1,
     }),
   ]);
 
@@ -74,7 +75,7 @@ export default async function PlaceDetailPage({
       {/* 하단 레이아웃: 댓글 작성 및 댓글 리스트 */}
       <CommentForm />
       <HydrationBoundary state={dehydratedState}>
-        <CommentList />
+        <CommentList placeId={id} />
       </HydrationBoundary>
     </div>
   );

@@ -42,6 +42,7 @@ export default function CommentCard({
             {isEditing ? (
               <CommentEditForm
                 initialContent={comment.content}
+                commentId={comment.id}
                 onEditClose={() => setIsEditing((prev) => !prev)}
               />
             ) : (
@@ -98,6 +99,7 @@ function ReplyComment({ reply }: { reply: ReplyDetailComment }) {
           {isEditing ? (
             <CommentEditForm
               initialContent={reply.content}
+              commentId={reply.id}
               onEditClose={() => setIsEditing((prev) => !prev)}
             />
           ) : (

@@ -6,6 +6,37 @@ import {
 import { createClient } from "../supabase/client";
 import { QUERY_KEYS } from "./queryKeys";
 
+// 상세 페이지 댓글 불러오기 (infinite query)
+export const useDetailComments = (id: string) => {
+  return useInfiniteQuery<DetailCommentResponse>({
+    queryKey: QUERY_KEYS.comments.byPlaceId(id),
+    queryFn: async ({ pageParam }) => {
+      const res = await fetch(
+        `/api/place/comments?external_institution_id=${id}&page=${pageParam}`,
+      );
+      const data: DetailCommentResponse = await res.json();
+
+      if (!res.ok) throw new Error("댓글 로딩 실패");
+      if (!data.success) throw new Error(data.message);
+
+      return data;
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage.success || !lastPage.totalCount) return undefined;
+
+      const totalLoaded = allPages
+        .filter((page) => page.success) // 필요없지만 타입 추론을 위해 추가
+        .reduce((sum, page) => sum + page.comments.length, 0);
+
+      return totalLoaded < lastPage.totalCount
+        ? allPages.length + 1
+        : undefined;
+    },
+  });
+};
+
+// 상세 페이지 댓글 및 답글 작성
 export const useCreateDetailComment = () => {
   return useMutation({
     mutationFn: async (newComment: DetailCommentInput) => {
@@ -60,35 +91,6 @@ export const useCreateDetailComment = () => {
     onError: (error) => {
       console.error("에러 발생", error);
       throw new Error("에상치 못한 오류가 발생하였습니다.");
-    },
-  });
-};
-
-export const useDetailComments = (id: string) => {
-  return useInfiniteQuery<DetailCommentResponse>({
-    queryKey: QUERY_KEYS.comments.byPlaceId(id),
-    queryFn: async ({ pageParam }) => {
-      const res = await fetch(
-        `/api/place/comments?external_institution_id=${id}&page=${pageParam}`,
-      );
-      const data: DetailCommentResponse = await res.json();
-
-      if (!res.ok) throw new Error("댓글 로딩 실패");
-      if (!data.success) throw new Error(data.message);
-
-      return data;
-    },
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage.success || !lastPage.totalCount) return undefined;
-
-      const totalLoaded = allPages
-        .filter((page) => page.success) // 필요없지만 타입 추론을 위해 추가
-        .reduce((sum, page) => sum + page.comments.length, 0);
-
-      return totalLoaded < lastPage.totalCount
-        ? allPages.length + 1
-        : undefined;
     },
   });
 };

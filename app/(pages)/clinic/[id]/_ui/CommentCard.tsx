@@ -19,6 +19,7 @@ export default function CommentCard({
   const [isEditing, setIsEditing] = useState(false);
   const { data } = useUser();
   const isMyComment = data.user ? data.user.id === comment.user_id : false;
+  const isUpdated = comment.created_at !== comment.updated_at;
 
   return (
     <Card className="py-0">
@@ -36,6 +37,7 @@ export default function CommentCard({
               {comment.profiles.nickname}
               <span className="ml-1 text-xs text-gray-500">
                 · {getTimeAgo(comment.created_at)}
+                {isUpdated && <span> (수정됨)</span>}
               </span>
             </p>
 
@@ -77,6 +79,7 @@ function ReplyComment({ reply }: { reply: ReplyDetailComment }) {
   const [isEditing, setIsEditing] = useState(false);
   const { data } = useUser();
   const isMyComment = data.user ? data.user.id === reply.user_id : false;
+  const isUpdated = reply.created_at !== reply.updated_at;
 
   return (
     <div className="border-l border-gray-300 bg-gray-50 py-2 pr-5 pl-2">
@@ -93,6 +96,7 @@ function ReplyComment({ reply }: { reply: ReplyDetailComment }) {
             {reply.profiles.nickname}
             <span className="ml-1 text-xs text-gray-500">
               · {getTimeAgo(reply.created_at)}
+              {isUpdated && <span> (수정됨)</span>}
             </span>
           </p>
 

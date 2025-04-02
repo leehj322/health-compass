@@ -12,9 +12,7 @@ import {
   usePlacesByKeyword,
   usePlacesByLocation,
 } from "@/lib/queries/usePlaceQueries";
-import { Meta } from "@/lib/api/kakaoLocal.type";
-import { CATEGORY_CODE } from "@/constants/categoryCode";
-import { filterByDutyTime } from "@/utils/filterByDutyTime";
+import { filterByDutyTime, flatPlacesByMode } from "@/utils/placeUtils";
 import LoadingOverlay from "@/app/_ui/shared/LoadingOverlay";
 
 export default function MainPage() {
@@ -30,6 +28,16 @@ export default function MainPage() {
     }
   }, [isAutoLoaded]);
 
+  const placesByLocationQueryEnabled = !isSearchMode && !!geoLocation;
+  const placedBySearchQueryEnabled =
+    isSearchMode && !!filterGroups.query && !!geoLocation;
+
+  const commonParams = [
+    geoLocation?.lat,
+    geoLocation?.lng,
+    filterGroups.distance * 1000,
+  ] as const;
+
   const {
     data: infiniteHospitals,
     fetchNextPage: fetchNextHospitalsPage,
@@ -37,11 +45,9 @@ export default function MainPage() {
     isFetching: isFetchingHospitals,
     isFetchingNextPage: isFetchingNextHospitalsPage,
   } = usePlacesByLocation(
-    geoLocation?.lat,
-    geoLocation?.lng,
-    filterGroups.distance * 1000,
+    ...commonParams,
     "hospital",
-    !isSearchMode && !!geoLocation,
+    placesByLocationQueryEnabled,
   );
 
   const {
@@ -51,11 +57,9 @@ export default function MainPage() {
     isFetching: isFetchingPharmacies,
     isFetchingNextPage: isFetchingNextPharmaciesPage,
   } = usePlacesByLocation(
-    geoLocation?.lat,
-    geoLocation?.lng,
-    filterGroups.distance * 1000,
+    ...commonParams,
     "pharmacy",
-    !isSearchMode && !!geoLocation,
+    placesByLocationQueryEnabled,
   );
 
   const {
@@ -65,65 +69,27 @@ export default function MainPage() {
     isFetching: isFetchingSearchResults,
     isFetchingNextPage: isFetchingNextSearchResultsPage,
   } = usePlacesByKeyword(
-    geoLocation?.lat,
-    geoLocation?.lng,
-    filterGroups.distance * 1000,
+    ...commonParams,
     filterGroups.query,
-    isSearchMode && !!filterGroups.query && !!geoLocation,
+    placedBySearchQueryEnabled,
   );
 
-  let hospitals, pharmacies;
+  // 검색 모드 유무에 따라 다른 형태의 flat한 데이터를 반환
+  const { hospitals, pharmacies, activeTab } = flatPlacesByMode({
+    isSearchMode,
+    infiniteSearchResults,
+    infiniteHospitals,
+    infinitePharmacies,
+  });
 
-  // 검색 모드일 경우, 첫 번째 검색 결과의 카테고리에 따라 병원 또는 약국 데이터만 필터링하여 표시합니다.
-  // 내 주변 모드일 경우, 내 주변 병원과 약국 데이터를 모두 표시합니다.
-  if (isSearchMode && infiniteSearchResults) {
-    const firstCategoryGroup = infiniteSearchResults.pages[0].places.find(
-      (place) =>
-        Object.values(CATEGORY_CODE).includes(place.category_group_code),
-    )?.category_group_code;
-
-    if (firstCategoryGroup === CATEGORY_CODE.hospital) {
-      hospitals = {
-        places: infiniteSearchResults.pages.flatMap((page) => page.places),
-        meta: { ...infiniteSearchResults.pages.at(-1)?.meta } as Meta,
-      };
-    }
-
-    if (firstCategoryGroup === CATEGORY_CODE.pharmacy) {
-      pharmacies = {
-        places: infiniteSearchResults.pages.flatMap((page) => page.places),
-        meta: { ...infiniteSearchResults.pages.at(-1)?.meta } as Meta,
-      };
-    }
-  } else {
-    hospitals = infiniteHospitals && {
-      places: infiniteHospitals.pages.flatMap((page) => page.places),
-      meta: infiniteHospitals.pages.at(-1)?.meta as Meta,
-    };
-
-    pharmacies = infinitePharmacies && {
-      places: infinitePharmacies.pages.flatMap((page) => page.places),
-      meta: infinitePharmacies.pages.at(-1)?.meta as Meta,
-    };
-  }
-
+  // 검색 이후에 탭 전환 (검색 결과에 따라)
   useEffect(() => {
-    if (!isSearchMode || !infiniteSearchResults) return;
-
-    const firstCategory = infiniteSearchResults.pages[0].places.find(
-      (place) =>
-        place.category_group_code === CATEGORY_CODE.hospital ||
-        place.category_group_code === CATEGORY_CODE.pharmacy,
-    )?.category_group_code;
-
-    if (firstCategory === CATEGORY_CODE.hospital) {
-      setActiveTab("hospital");
-    } else if (firstCategory === CATEGORY_CODE.pharmacy) {
-      setActiveTab("pharmacy");
+    if (activeTab) {
+      setActiveTab(activeTab);
     }
-  }, [isSearchMode, infiniteSearchResults]);
+  }, [activeTab]);
 
-  // 데이터 필터링 (제공하는 API 특성상 결과값을 10개씩 띄우기가 불가능)
+  // 데이터 필터링 (한계: 제공하는 API 특성상 결과값을 10개씩 띄우기가 불가능)
   const filteredHospitals = filterByDutyTime(hospitals, filterGroups);
   const filteredPharmacies = filterByDutyTime(pharmacies, filterGroups);
 
@@ -132,6 +98,7 @@ export default function MainPage() {
       {(isFetchingHospitals ||
         isFetchingPharmacies ||
         isFetchingSearchResults) && <LoadingOverlay />}
+
       <div className="flex flex-col md:h-[calc(100vh-5rem)] md:flex-row">
         {/* Left: Kakao Map */}
         <KakaoMap

@@ -7,14 +7,17 @@ export default function VerifyEmailPage() {
     <div className="flex min-h-[calc(100vh-5rem)] flex-col items-center justify-center bg-white px-4 text-center">
       <MailCheck className="mb-4 h-12 w-12 text-emerald-600 md:h-20 md:w-20 lg:h-24 lg:w-24" />
       <h1 className="mb-3 text-lg font-bold text-gray-900 md:text-3xl lg:text-4xl">
-        이메일을 확인해주세요
+        이메일 인증 제한 해제
+        {/* 이메일을 확인해주세요 */}
       </h1>
       <p className="mb-6 max-w-xs text-sm text-gray-600 md:max-w-none md:text-lg lg:text-xl">
         <span className="block md:inline">
-          입력하신 이메일로 인증 메일을 보냈습니다.
+          현재 이메일 인증기능이 제한 해제 되어있습니다.
+          {/* 입력하신 이메일로 인증 메일을 보냈습니다. */}
         </span>
-        <span className="block md:inline">
-          메일의 링크를 클릭하여 인증을 완료해주세요.
+        <span className="block md:ml-2 md:inline">
+          로그인 페이지로 이동하여 바로 로그인해주세요.
+          {/* 메일의 링크를 클릭하여 인증을 완료해주세요. */}
         </span>
       </p>
       <Button

@@ -4,7 +4,7 @@
 
 -- 좋아요 기록 테이블 생성
 CREATE TABLE public.place_likes (
-  place_id uuid NOT NULL,                       -- 대상 장소 ID
+  place_id text NOT NULL,                       -- 대상 장소 ID
   account_id uuid NOT NULL,                     -- 좋아요를 누른 계정 ID
   created_at timestamptz NOT NULL DEFAULT now(), -- 좋아요를 누른 시각
   PRIMARY KEY (place_id, account_id),           -- 한 계정이 한 장소에 대해 중복 좋아요를 못하게 함

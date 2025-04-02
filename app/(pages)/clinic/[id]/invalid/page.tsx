@@ -11,7 +11,9 @@ export default function InvalidDetailPage() {
       </h1>
       <p className="mb-6 max-w-xs text-sm text-gray-600 md:max-w-none md:text-lg lg:text-xl">
         <span className="block md:inline">장소 정보가 존재하지 않거나,</span>
-        <span className="block md:inline">잘못된 링크로 접근하셨습니다.</span>
+        <span className="block md:ml-2 md:inline">
+          잘못된 링크로 접근하셨습니다.
+        </span>
       </p>
       <Button
         asChild

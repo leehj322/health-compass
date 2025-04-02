@@ -5,6 +5,13 @@ export const QUERY_KEYS = {
   comments: {
     byPlaceId: (id: string) => ["comments", id],
   },
+  likes: {
+    byPlaceId: (placeId: string, accountId?: string) => [
+      "likes",
+      placeId,
+      accountId,
+    ],
+  },
   places: {
     byLocation: (
       lat: number,

@@ -32,6 +32,12 @@ export default function MainPage() {
   const placedBySearchQueryEnabled =
     isSearchMode && !!filterGroups.query && !!geoLocation;
 
+  const commonParams = [
+    geoLocation?.lat,
+    geoLocation?.lng,
+    filterGroups.distance * 1000,
+  ] as const;
+
   const {
     data: infiniteHospitals,
     fetchNextPage: fetchNextHospitalsPage,
@@ -39,9 +45,7 @@ export default function MainPage() {
     isFetching: isFetchingHospitals,
     isFetchingNextPage: isFetchingNextHospitalsPage,
   } = usePlacesByLocation(
-    geoLocation?.lat,
-    geoLocation?.lng,
-    filterGroups.distance * 1000,
+    ...commonParams,
     "hospital",
     placesByLocationQueryEnabled,
   );
@@ -53,9 +57,7 @@ export default function MainPage() {
     isFetching: isFetchingPharmacies,
     isFetchingNextPage: isFetchingNextPharmaciesPage,
   } = usePlacesByLocation(
-    geoLocation?.lat,
-    geoLocation?.lng,
-    filterGroups.distance * 1000,
+    ...commonParams,
     "pharmacy",
     placesByLocationQueryEnabled,
   );
@@ -67,9 +69,7 @@ export default function MainPage() {
     isFetching: isFetchingSearchResults,
     isFetchingNextPage: isFetchingNextSearchResultsPage,
   } = usePlacesByKeyword(
-    geoLocation?.lat,
-    geoLocation?.lng,
-    filterGroups.distance * 1000,
+    ...commonParams,
     filterGroups.query,
     placedBySearchQueryEnabled,
   );

@@ -11,9 +11,9 @@ export default function NotFound() {
       </h1>
       <p className="mb-6 max-w-xs text-sm text-gray-600 md:max-w-none md:text-lg lg:text-xl">
         <span className="block md:inline">
-          요청하신 페이지가 존재하지 않거나,
+          요청하신 페이지가 제공되지 않는 서비스이거나,
         </span>
-        <span className="block md:inline">이동되었을 수 있습니다.</span>
+        <span className="block md:ml-2 md:inline">이동되었을 수 있습니다.</span>
       </p>
       <Button
         asChild

@@ -20,7 +20,6 @@ import { PASSWORD_REGEX } from "@/constants/regex";
 import { useSignin } from "@/lib/queries/useAuthQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
-import { getAuthSessionRoute } from "@/lib/authSessionRoute";
 
 const signInFormSchema = z.object({
   email: z
@@ -55,8 +54,7 @@ export default function SignInForm() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user.all });
-          const prevFullPath = getAuthSessionRoute();
-          router.push(prevFullPath || "/");
+          router.push("/");
         },
         onError: (error) => {
           setFormError(error.message);

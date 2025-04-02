@@ -3,7 +3,6 @@ import Providers from "./providers";
 import "./globals.css";
 import Navbar from "./_ui/layout/Navbar";
 import { Toaster } from "@/components/ui/sonner";
-import AuthRouteTracker from "./_ui/layout/AuthRouteTracker";
 
 export const metadata: Metadata = {
   title: "건강 나침반",
@@ -19,7 +18,6 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`antialiased`}>
-        <AuthRouteTracker />
         <Providers>
           <Navbar />
           {children}

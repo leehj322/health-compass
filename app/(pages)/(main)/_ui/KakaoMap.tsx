@@ -13,6 +13,7 @@ import { useGeoLocationStore } from "@/stores/useGeoLocation";
 import { Home } from "lucide-react";
 import Spinner from "@/app/_ui/shared/Spinner";
 import { MARKER_SRC } from "@/constants/markerSrc";
+import { buildPlaceDetailQuery } from "@/utils/buildQueryString";
 
 interface KakaoMapProps extends React.ComponentProps<"div"> {
   hospitals?: PlacesByLocationResponse;
@@ -139,7 +140,9 @@ function MapMarkers({ places, variant }: MapMarkersProps) {
       key={place.id}
       position={{ lat: Number(place.y), lng: Number(place.x) }}
       title={place.place_name}
-      onClick={() => router.push(`/clinic/${place.id}`)}
+      onClick={() =>
+        router.push(`/clinic/${place.id}?${buildPlaceDetailQuery(place)}`)
+      }
       image={{
         src: MARKER_SRC[variant],
         size: {

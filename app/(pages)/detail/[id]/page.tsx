@@ -67,7 +67,7 @@ export default async function PlaceDetailPage({
             <PlaceHoursToggle placeData={placeData} />
           </div>
           <div className="flex items-center justify-end space-x-4">
-            <PlaceSocialActions />
+              <PlaceSocialActions placeId={id} />
           </div>
         </div>
       </div>

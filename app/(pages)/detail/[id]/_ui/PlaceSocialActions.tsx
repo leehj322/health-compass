@@ -2,10 +2,23 @@
 
 import { useState } from "react";
 import { Heart, Share2 } from "lucide-react";
+import { useUser } from "@/lib/queries/useUserQueries";
+import { usePlaceLikes } from "@/lib/queries/usePlaceLikesQueries";
 
-export default function PlaceSocialActions() {
+interface PlaceSocialActionsProps {
+  placeId: string;
+}
+
+export default function PlaceSocialActions({
+  placeId,
+}: PlaceSocialActionsProps) {
   const [liked, setLiked] = useState(false);
-  const likeCount = 42;
+
+  const {
+    data: { user },
+  } = useUser();
+
+  const { data: likesData } = usePlaceLikes(placeId, user?.id);
 
   return (
     <>
@@ -19,7 +32,7 @@ export default function PlaceSocialActions() {
           }
           size={20}
         />
-        <span className="text-sm">{likeCount}명</span>
+        <span className="text-sm">{likesData?.likeCount || 0} 명</span>
       </button>
       <button className="flex cursor-pointer items-center space-x-1">
         <Share2 className="text-gray-500" size={20} />

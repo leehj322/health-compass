@@ -10,22 +10,23 @@ interface ScrollToTopButtonProps {
 export default function ScrollToTopButton({
   triggerRef,
 }: ScrollToTopButtonProps) {
-  const [visible, setVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!triggerRef.current) return;
+    const target = triggerRef.current;
+    if (!target) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setVisible(!entry.isIntersecting);
+        setIsVisible(!entry.isIntersecting);
       },
       { root: null, threshold: 0 },
     );
 
-    observer.observe(triggerRef.current);
+    observer.observe(target);
 
     return () => {
-      if (triggerRef.current) observer.unobserve(triggerRef.current);
+      if (target) observer.unobserve(target);
     };
   }, [triggerRef]);
 
@@ -33,12 +34,12 @@ export default function ScrollToTopButton({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (!visible) return null;
+  if (!isVisible) return null;
 
   return (
     <button
       onClick={scrollToTop}
-      className="fixed right-6 bottom-6 z-50 cursor-pointer rounded-full border border-emerald-600 bg-white p-3 text-emerald-600 shadow-lg transition-colors hover:bg-gray-100"
+      className="fixed right-6 bottom-6 z-50 cursor-pointer rounded-full border border-emerald-600 bg-white p-3 text-emerald-600 opacity-70 shadow-lg transition-colors hover:bg-gray-100"
       aria-label="맨 위로 이동"
     >
       <ArrowUp className="h-5 w-5" />

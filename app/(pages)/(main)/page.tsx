@@ -82,6 +82,7 @@ export default function MainPage() {
     infinitePharmacies,
   });
 
+  // 검색 이후에 탭 전환 (검색 결과에 따라)
   useEffect(() => {
     if (activeTab) {
       setActiveTab(activeTab);

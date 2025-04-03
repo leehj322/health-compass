@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCreateDetailComment } from "@/lib/queries/useCommentsQueries";
 import { useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ErrorToast } from "@/lib/toasts";
+import { errorToast } from "@/lib/ui/toasts";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 import Spinner from "@/app/_ui/shared/Spinner";
@@ -34,7 +34,7 @@ export default function CommentForm() {
             queryKey: QUERY_KEYS.comments.byPlaceId(placeId),
           });
         },
-        onError: (error) => ErrorToast("댓글 작성 실패", error.message),
+        onError: (error) => errorToast("댓글 작성 실패", error.message),
       },
     );
   };

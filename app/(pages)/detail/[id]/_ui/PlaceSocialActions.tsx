@@ -10,7 +10,7 @@ import {
 } from "@/lib/queries/usePlaceLikesQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
-import { defaultToast, ErrorToast } from "@/lib/toasts";
+import { defaultToast, errorToast } from "@/lib/ui/toasts";
 
 interface PlaceSocialActionsProps {
   placeId: string;
@@ -42,7 +42,7 @@ export default function PlaceSocialActions({
 
   const handleLikeButtonClick = () => {
     if (!user) {
-      ErrorToast("로그인이 필요한 기능입니다.");
+      errorToast("로그인이 필요한 기능입니다.");
       return;
     }
 
@@ -76,7 +76,7 @@ export default function PlaceSocialActions({
       await navigator.clipboard.writeText(window.location.href);
       defaultToast("URL이 복사되었습니다!");
     } catch {
-      ErrorToast("URL 복사에 실패했습니다.");
+      errorToast("URL 복사에 실패했습니다.");
     }
   };
 

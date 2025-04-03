@@ -20,7 +20,7 @@ export default function HospitalPharmacyCard({
 
   return (
     <li>
-      <Link href={`/clinic/${place.id}?${query}`}>
+      <Link href={`/detail/${place.id}?${query}`}>
         <Card className="relative py-3">
           <span className="text-muted-foreground absolute top-2 right-3 text-sm">
             {formatDistance(Number(place.distance)) || "? m"}

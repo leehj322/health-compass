@@ -13,6 +13,8 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
+import { createClient } from "@/lib/supabase/server";
+import { fetchLikesByPlaceId } from "@/lib/api/places/fetchLikesByPlaceId";
 
 type PlaceDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -37,8 +39,17 @@ export default async function PlaceDetailPage({
 
   const queryClient = new QueryClient();
 
-  const [placeDetailRes /* , _ */] = await Promise.allSettled([
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [placeDetailRes /* , _ , _ */] = await Promise.allSettled([
     fetchPlaceDetail({ id, name, addr, x: Number(x), y: Number(y) }),
+    queryClient.prefetchQuery({
+      queryKey: QUERY_KEYS.likes.byPlaceId(id, user?.id),
+      queryFn: async () => await fetchLikesByPlaceId(id, user?.id),
+    }),
     queryClient.prefetchInfiniteQuery({
       queryKey: QUERY_KEYS.comments.byPlaceId(id),
       queryFn: async () => await fetchCommentsByPlaceId(id),
@@ -46,14 +57,14 @@ export default async function PlaceDetailPage({
     }),
   ]);
 
-  const dehydratedState = dehydrate(queryClient);
-
   // 장소 정보 처리 (실패 시 invalid 페이지로 redirect)
   if (placeDetailRes.status !== "fulfilled") {
     console.error("장소 정보 요청 실패:", placeDetailRes.reason);
     redirect(`/clinic/${id}/invalid`);
   }
   const placeData = placeDetailRes.value;
+
+  const dehydratedState = dehydrate(queryClient);
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
@@ -67,7 +78,9 @@ export default async function PlaceDetailPage({
             <PlaceHoursToggle placeData={placeData} />
           </div>
           <div className="flex items-center justify-end space-x-4">
-            <PlaceSocialActions />
+            <HydrationBoundary state={dehydratedState}>
+              <PlaceSocialActions placeId={id} />
+            </HydrationBoundary>
           </div>
         </div>
       </div>

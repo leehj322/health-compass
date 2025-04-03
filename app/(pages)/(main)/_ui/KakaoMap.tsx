@@ -141,7 +141,7 @@ function MapMarkers({ places, variant }: MapMarkersProps) {
       position={{ lat: Number(place.y), lng: Number(place.x) }}
       title={place.place_name}
       onClick={() =>
-        router.push(`/clinic/${place.id}?${buildPlaceDetailQuery(place)}`)
+        router.push(`/detail/${place.id}?${buildPlaceDetailQuery(place)}`)
       }
       image={{
         src: MARKER_SRC[variant],

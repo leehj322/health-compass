@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
 import { useCreateDetailComment } from "@/lib/queries/useCommentsQueries";
-import { ErrorToast } from "@/lib/toasts";
+import { errorToast } from "@/lib/ui/toasts";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -56,7 +56,7 @@ function CommentReplyForm({ parentId }: CommentReplyFormProps) {
             queryKey: QUERY_KEYS.comments.byPlaceId(placeId),
           });
         },
-        onError: (error) => ErrorToast("답글 작성 실패", error.message),
+        onError: (error) => errorToast("답글 작성 실패", error.message),
       },
     );
   };

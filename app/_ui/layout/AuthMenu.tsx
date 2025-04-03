@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSignout } from "@/lib/queries/useAuthQueries";
-import { ErrorToast } from "@/lib/toasts";
+import { errorToast } from "@/lib/ui/toasts";
 import Image from "next/image";
 import Link from "next/link";
 import Spinner from "../shared/Spinner";
@@ -60,7 +60,7 @@ function ProfileMenu({ profile }: ProfileMenuProps) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.user.all });
       },
       onError: (error) => {
-        ErrorToast("로그아웃 실패", error.message);
+        errorToast("로그아웃 실패", error.message);
       },
     });
   };

@@ -5,7 +5,7 @@ import Spinner from "@/app/_ui/shared/Spinner";
 import { useUpdateDetailComment } from "@/lib/queries/useCommentsQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
-import { ErrorToast } from "@/lib/toasts";
+import { errorToast } from "@/lib/ui/toasts";
 import { usePathname } from "next/navigation";
 
 interface CommentEditFormProps {
@@ -40,7 +40,7 @@ export default function CommentEditForm({
           });
           onEditClose();
         },
-        onError: (error) => ErrorToast("댓글 수정 실패", error.message),
+        onError: (error) => errorToast("댓글 수정 실패", error.message),
       },
     );
   };

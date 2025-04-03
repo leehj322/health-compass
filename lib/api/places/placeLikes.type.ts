@@ -10,6 +10,14 @@ export interface PlaceLikesErrorResponse {
   message: string;
 }
 
+export interface PlaceLikesEditSuccessResponse {
+  success: true;
+}
+
+export type PlaceLikesEditResponse =
+  | PlaceLikesEditSuccessResponse
+  | PlaceLikesErrorResponse;
+
 export type PlaceLikesResponse =
   | PlaceLikesSuccessResponse
   | PlaceLikesErrorResponse;

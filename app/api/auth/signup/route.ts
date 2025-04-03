@@ -1,4 +1,3 @@
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -32,10 +31,13 @@ export async function POST(req: Request) {
       });
 
       // 프로필 등록 에러 처리
-      if (profileError) {
+      if (
+        profileError &&
+        !profileError.message.includes(
+          "duplicate key value violates unique constraint",
+        )
+      ) {
         console.error("프로필 생성 실패:", profileError);
-
-        await supabaseAdmin.auth.admin.deleteUser(data.user.id);
 
         return NextResponse.json(
           {

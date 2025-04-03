@@ -1,13 +1,36 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
+import { errorToast } from "@/lib/ui/toasts";
 
 export default function SocialSignInButtons() {
+  const supabase = createClient();
+  const handleOAuthSignin = async (provider: "google" | "kakao") => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      errorToast(
+        `${provider} 로그인 실패`,
+        "로그인에 실패하였습니다. 잠시 후 다시 시도해주세요.",
+      );
+      return;
+    }
+  };
+
   return (
     <div className="flex w-full max-w-md gap-4">
       <Button
         type="button"
         variant="outline"
         className="h-10 flex-1 cursor-pointer border-gray-300 text-sm"
+        onClick={() => handleOAuthSignin("google")}
       >
         <Image
           src="/icons/google-login.png"
@@ -22,6 +45,7 @@ export default function SocialSignInButtons() {
         type="button"
         variant="outline"
         className="h-10 flex-1 cursor-pointer border border-gray-300 text-sm"
+        onClick={() => handleOAuthSignin("kakao")}
       >
         <Image
           src="/icons/kakao-login.png"

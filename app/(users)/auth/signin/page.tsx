@@ -1,7 +1,7 @@
 import AuthTitle from "../_ui/AuthTitle";
 import SignInForm from "./_ui/SignInForm";
 import FormDivider from "../_ui/FormDivider";
-import SocialSignInButtons from "./_ui/SocialSignInButtons";
+import SocialSignInButtons from "../_ui/SocialSignInButtons";
 import AuthPageRedirectLink from "../_ui/AuthRedirectLink";
 
 export default function SignInPage() {

@@ -1,7 +1,7 @@
 import AuthTitle from "../_ui/AuthTitle";
 import SignUpForm from "./_ui/SignUpForm";
 import FormDivider from "../_ui/FormDivider";
-import SocialSignUpButtons from "./_ui/SocialSignUpButtons";
+import SocialSignInButtons from "../_ui/SocialSignInButtons";
 import AuthPageRedirectLink from "../_ui/AuthRedirectLink";
 
 export default function SignUpPage() {
@@ -12,7 +12,7 @@ export default function SignUpPage() {
 
       <FormDivider />
 
-      <SocialSignUpButtons />
+      <SocialSignInButtons />
       <AuthPageRedirectLink href="/auth/signin">
         이미 회원이신가요?
       </AuthPageRedirectLink>

@@ -10,7 +10,7 @@ import {
 } from "@/lib/queries/usePlaceLikesQueries";
 import { useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/lib/queries/queryKeys";
-import { ErrorToast } from "@/lib/toasts";
+import { defaultToast, ErrorToast } from "@/lib/toasts";
 
 interface PlaceSocialActionsProps {
   placeId: string;
@@ -71,6 +71,15 @@ export default function PlaceSocialActions({
     }
   };
 
+  const handleShareButtonClick = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      defaultToast("URL이 복사되었습니다!");
+    } catch {
+      ErrorToast("URL 복사에 실패했습니다.");
+    }
+  };
+
   return (
     <>
       <button
@@ -85,7 +94,10 @@ export default function PlaceSocialActions({
         />
         <span className="text-sm">{likeCount} 명</span>
       </button>
-      <button className="flex cursor-pointer items-center space-x-1">
+      <button
+        onClick={handleShareButtonClick}
+        className="flex cursor-pointer items-center space-x-1"
+      >
         <Share2 className="text-gray-500" size={20} />
         <span className="text-sm">공유</span>
       </button>

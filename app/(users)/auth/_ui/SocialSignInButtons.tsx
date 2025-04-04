@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { errorToast } from "@/lib/ui/toasts";
+import { getUrl } from "@/utils/getUrl";
 
 export default function SocialSignInButtons() {
   const supabase = createClient();
@@ -11,7 +12,7 @@ export default function SocialSignInButtons() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: getUrl() + "auth/callback",
       },
     });
 
